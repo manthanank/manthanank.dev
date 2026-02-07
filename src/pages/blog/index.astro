@@ -5,7 +5,7 @@ import { getCollection } from 'astro:content';
 
 const DEVTO_USERNAME = 'manthanank';
 
-// Get local posts
+// Get local posts with reading time
 const localPosts = await getCollection('blog', ({ data }) => !data.draft);
 
 // Get Dev.to posts
@@ -22,11 +22,19 @@ try {
         tags: article.tag_list,
       },
       url: article.url,
-      isExternal: true
+      isExternal: true,
+      readingTime: article.reading_time_minutes || undefined
     }));
   }
 } catch (e) {
   console.warn('Failed to fetch posts from Dev.to');
+}
+
+// Calculate reading time for local posts
+function calculateReadingTime(body: string | undefined): number {
+  if (!body) return 1;
+  const wordCount = body.split(/\s+/g).length;
+  return Math.max(1, Math.round(wordCount / 200));
 }
 
 // Combine and sort
@@ -34,7 +42,8 @@ const posts = [
   ...localPosts.map(post => ({
     data: post.data,
     url: `/blog/${post.id}`,
-    isExternal: false
+    isExternal: false,
+    readingTime: calculateReadingTime(post.body)
   })),
   ...devtoPosts
 ].sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
@@ -57,6 +66,7 @@ const posts = [
           date={post.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
           tags={post.data.tags}
           url={post.url}
+          readingTime={post.readingTime}
         />
       ))}
     </div>

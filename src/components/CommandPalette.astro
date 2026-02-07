@@ -50,6 +50,7 @@
     action?: string;
     type: 'action' | 'page' | 'project' | 'blog';
     category?: string;
+    tags?: string[];
   }
 
   const staticActions: PaletteItem[] = [
@@ -61,6 +62,7 @@
     { title: 'Switch to Dark Mode', description: 'Change theme to dark', action: 'theme-dark', type: 'action', category: 'Actions' },
     { title: 'Switch to Light Mode', description: 'Change theme to light', action: 'theme-light', type: 'action', category: 'Actions' },
     { title: 'Download Resume', description: 'Get a copy of my CV', action: 'resume-download', type: 'action', category: 'Actions' },
+    // { title: 'Toggle Language', description: 'Switch between English and Hindi', action: 'toggle-lang', type: 'action', category: 'Actions' }, // i18n disabled
   ];
 
   let dynamicItems: PaletteItem[] = [];
@@ -72,6 +74,25 @@
   const resultsList = document.getElementById('palette-results');
   const trigger = document.getElementById('palette-trigger');
 
+  // Enhanced Fuse.js configuration for better fuzzy search
+  const fuseOptions: Fuse.IFuseOptions<PaletteItem> = {
+    keys: [
+      { name: 'title', weight: 0.4 },
+      { name: 'description', weight: 0.3 },
+      { name: 'category', weight: 0.15 },
+      { name: 'tags', weight: 0.15 },
+    ],
+    threshold: 0.4,              // Allow more fuzzy matches (0 = exact, 1 = match anything)
+    distance: 100,               // How close the match must be to the initial position
+    minMatchCharLength: 2,       // Minimum characters to start matching
+    includeMatches: true,        // Include matching indices for highlighting
+    includeScore: true,          // Include match score for sorting
+    shouldSort: true,            // Sort by score
+    findAllMatches: true,        // Don't stop at first match
+    ignoreLocation: true,        // Don't factor in location for better partial matches
+    useExtendedSearch: true,     // Enable extended search patterns
+  };
+
   async function loadIndex() {
     try {
       const res = await fetch('/search.json');
@@ -82,16 +103,12 @@
       }));
       
       const allItems = [...staticActions, ...dynamicItems];
-      fuse = new Fuse(allItems, {
-        keys: ['title', 'description', 'category'],
-        threshold: 0.3,
-        includeMatches: true
-      });
+      fuse = new Fuse(allItems, fuseOptions);
       
       renderResults(allItems); // Initial view
     } catch (e) {
       console.error('Palette index load failed');
-      fuse = new Fuse(staticActions, { keys: ['title'], threshold: 0.3 });
+      fuse = new Fuse(staticActions, fuseOptions);
       renderResults(staticActions);
     }
   }
@@ -117,11 +134,23 @@
     }
   }
 
-  function renderResults(items: PaletteItem[]) {
+  function renderResults(items: PaletteItem[], searchQuery?: string) {
     if (!resultsList) return;
 
     if (items.length === 0) {
-      resultsList.innerHTML = '<div class="palette-empty">No results found</div>';
+      resultsList.innerHTML = `
+        <div class="palette-empty">
+          <div class="palette-empty-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.3-4.3"/>
+              <path d="M8 8h6"/>
+            </svg>
+          </div>
+          <p>No results found${searchQuery ? ` for "<strong>${searchQuery}</strong>"` : ''}</p>
+          <p style="font-size: 0.8rem; margin-top: 0.5rem; opacity: 0.7;">Try a different search term</p>
+        </div>
+      `;
       return;
     }
 
@@ -144,12 +173,18 @@
           const link = isAction ? '#' : item.url;
           const icon = getIcon(item.type);
           
+          // Show tags if they exist
+          const tagsHtml = item.tags && item.tags.length > 0
+            ? `<div class="item-tags">${item.tags.slice(0, 3).map(tag => `<span class="item-tag">${tag}</span>`).join('')}</div>`
+            : '';
+          
           html += `
             <a href="${link}" class="palette-item" data-action="${item.action || ''}" data-type="${item.type}">
               <div class="item-icon">${icon}</div>
               <div class="item-content">
                 <div class="item-title">${item.title}</div>
                 <div class="item-desc">${item.description}</div>
+                ${tagsHtml}
               </div>
               <div class="item-shortcut">↵</div>
             </a>
@@ -199,6 +234,20 @@
         link.download = 'Manthan_Ankolekar_Resume.pdf';
         link.click();
         break;
+      case 'toggle-lang':
+        // Toggle between English and Hindi
+        const currentLang = localStorage.getItem('preferred-lang') || 'en';
+        const newLang = currentLang === 'en' ? 'hi' : 'en';
+        localStorage.setItem('preferred-lang', newLang);
+        
+        // Redirect to the new language path
+        const currentPath = window.location.pathname;
+        const pathWithoutLang = currentPath.startsWith('/hi/') 
+          ? currentPath.slice(3) || '/'
+          : currentPath;
+        const newPath = newLang === 'en' ? pathWithoutLang : `/hi${pathWithoutLang}`;
+        window.location.href = newPath;
+        break;
     }
   }
 
@@ -239,13 +288,13 @@
   });
 
   input?.addEventListener('input', (e) => {
-    const val = (e.target as HTMLInputElement).value;
+    const val = (e.target as HTMLInputElement).value.trim();
     if (!val) {
       renderResults([...staticActions, ...dynamicItems]);
       return;
     }
     const results = fuse?.search(val).map(r => r.item) || [];
-    renderResults(results);
+    renderResults(results, val);
   });
 
   overlay?.addEventListener('click', () => togglePalette(false));
@@ -499,5 +548,42 @@
       max-height: 80vh;
       padding-top: 0;
     }
+  }
+
+  /* Search highlight */
+  .highlight {
+    background: rgba(0, 212, 255, 0.2);
+    color: var(--color-primary);
+    border-radius: 2px;
+    padding: 0 2px;
+    font-weight: 600;
+  }
+
+  /* Empty state */
+  .palette-empty {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--color-text-muted);
+  }
+
+  .palette-empty-icon {
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  /* Tags display */
+  .item-tags {
+    display: flex;
+    gap: 0.3rem;
+    margin-top: 0.25rem;
+  }
+
+  .item-tag {
+    font-size: 0.65rem;
+    padding: 0.1rem 0.4rem;
+    background: rgba(124, 58, 237, 0.1);
+    color: var(--color-accent-light);
+    border-radius: 4px;
+    font-family: var(--font-mono);
   }
 </style>

@@ -1,6 +1,7 @@
 ---
 import ThemeToggle from './ThemeToggle.astro';
 import CommandPalette from './CommandPalette.astro';
+// import LanguageSwitcher from './LanguageSwitcher.astro'; // i18n disabled for now
 
 const currentPath = Astro.url.pathname;
 
@@ -39,6 +40,7 @@ const navLinks = [
       
       <div class="nav-actions">
         <CommandPalette />
+        <!-- <LanguageSwitcher /> i18n disabled for now -->
         <ThemeToggle />
         <button class="mobile-toggle" aria-label="Toggle navigation" id="mobile-toggle">
           <span class="bar"></span>

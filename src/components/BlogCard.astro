@@ -5,15 +5,19 @@ interface Props {
   date: string;
   tags: string[];
   url: string;
+  readingTime?: number;
 }
 
-const { title, excerpt, date, tags, url } = Astro.props;
+const { title, excerpt, date, tags, url, readingTime } = Astro.props;
 const isExternal = url.startsWith('http');
 ---
 
 <article class="blog-card" data-tilt>
   <div class="blog-meta">
-    <time class="blog-date">{date}</time>
+    <div class="blog-meta-left">
+      <time class="blog-date">{date}</time>
+      {readingTime && <span class="reading-time">• {readingTime} min read</span>}
+    </div>
     <div class="blog-tags">
       {tags.map((tag) => (
         <span class="blog-tag">{tag}</span>
@@ -24,7 +28,7 @@ const isExternal = url.startsWith('http');
     <a href={url} {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>{title}</a>
   </h3>
   <p class="blog-excerpt">{excerpt}</p>
-  <a href={url} {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})} class="read-more">
+  <a href={url} {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})} class="read-more" aria-label={`Read more about ${title}`}>
     Read more
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
   </a>
@@ -48,14 +52,27 @@ const isExternal = url.startsWith('http');
   .blog-meta {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 1rem;
     margin-bottom: 1rem;
     flex-wrap: wrap;
   }
 
+  .blog-meta-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
   .blog-date {
     font-family: var(--font-mono);
     font-size: 0.8rem;
+    color: var(--color-text-muted);
+  }
+
+  .reading-time {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
     color: var(--color-text-muted);
   }
 
