@@ -1,0 +1,117 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BlogCard from '../../components/BlogCard.astro';
+import { getCollection } from 'astro:content';
+
+const DEVTO_USERNAME = 'manthanank';
+
+// Get local posts
+const localPosts = await getCollection('blog', ({ data }) => !data.draft);
+
+// Get Dev.to posts
+let devtoPosts = [];
+try {
+  const res = await fetch(`https://dev.to/api/articles?username=${DEVTO_USERNAME}`);
+  if (res.ok) {
+    const data = await res.json();
+    devtoPosts = data.map((article) => ({
+      data: {
+        title: article.title,
+        description: article.description,
+        pubDate: new Date(article.published_at),
+        tags: article.tag_list,
+      },
+      url: article.url,
+      isExternal: true
+    }));
+  }
+} catch (e) {
+  console.warn('Failed to fetch posts from Dev.to');
+}
+
+// Combine and sort
+const posts = [
+  ...localPosts.map(post => ({
+    data: post.data,
+    url: `/blog/${post.id}`,
+    isExternal: false
+  })),
+  ...devtoPosts
+].sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<BaseLayout title="Blog | Manthan Ankolekar" description="Technical articles and tutorials by Manthan Ankolekar on Angular, Node.js, TypeScript, and web development.">
+  <section class="section blog-hero">
+    <div class="container">
+      <h1 class="section-title">Blog</h1>
+      <p class="section-subtitle">Thoughts, tutorials, and insights on web development</p>
+    </div>
+  </section>
+
+  <section class="container blog-section">
+    <div class="blog-grid">
+      {posts.map((post) => (
+        <BlogCard
+          title={post.data.title}
+          excerpt={post.data.description}
+          date={post.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+          tags={post.data.tags}
+          url={post.url}
+        />
+      ))}
+    </div>
+
+    <div class="blog-cta">
+      <p>I also write on Medium about web development topics.</p>
+      <a href="https://medium.com/@manthanank" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
+        Read More on Medium
+      </a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .blog-hero {
+    padding-top: 8rem;
+    padding-bottom: 0;
+  }
+
+  .blog-section {
+    padding-bottom: 5rem;
+  }
+
+  .blog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr));
+    gap: 1.5rem;
+  }
+
+  .blog-cta {
+    text-align: center;
+    margin-top: 4rem;
+    padding: 3rem;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+
+  .blog-cta p {
+    color: var(--color-text-muted);
+    margin-bottom: 1.5rem;
+    font-size: 1.05rem;
+  }
+
+  @media (max-width: 768px) {
+    .blog-hero {
+      padding-top: 6rem;
+    }
+
+    .blog-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .blog-cta {
+      padding: 2rem 1.5rem;
+    }
+  }
+</style>

@@ -1,0 +1,111 @@
+---
+---
+
+<div class="cursor-dot"></div>
+<div class="cursor-outline"></div>
+
+<script>
+  function initCursor() {
+    // Disable on touch devices
+    if (window.matchMedia("(any-hover: none)").matches) return;
+
+    const dot = document.querySelector('.cursor-dot') as HTMLElement;
+    const outline = document.querySelector('.cursor-outline') as HTMLElement;
+
+    if (!dot || !outline) return;
+
+    let posX = 0, posY = 0;
+    let mouseX = 0, mouseY = 0;
+
+    // Follow mouse
+    window.addEventListener("mousemove", (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      
+      dot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+    });
+
+    // Spring animation for outline
+    function animate() {
+      posX += (mouseX - posX) * 0.15;
+      posY += (mouseY - posY) * 0.15;
+
+      outline.style.transform = `translate3d(${posX}px, ${posY}px, 0)`;
+
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    // Hover effects
+    const interactiveElements = document.querySelectorAll('a, button, .btn, .project-card, .blog-card');
+    
+    interactiveElements.forEach((el) => {
+      el.addEventListener('mouseenter', () => {
+        outline.classList.add('hover');
+        dot.classList.add('hover');
+      });
+      el.addEventListener('mouseleave', () => {
+        outline.classList.remove('hover');
+        dot.classList.remove('hover');
+      });
+    });
+  }
+
+  // Run on load
+  initCursor();
+
+  // Run after view transitions
+  document.addEventListener('astro:after-swap', initCursor);
+</script>
+
+<style>
+  .cursor-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--color-primary);
+    border-radius: 50%;
+    position: fixed;
+    top: -3px;
+    left: -3px;
+    pointer-events: none;
+    z-index: 10000;
+    transition: transform 0.1s ease-out, width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
+  }
+
+  .cursor-outline {
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--color-primary);
+    border-radius: 50%;
+    position: fixed;
+    top: -15px;
+    left: -15px;
+    pointer-events: none;
+    z-index: 9999;
+    transition: width 0.3s ease, height 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+  }
+
+  .cursor-dot.hover {
+    width: 4px;
+    height: 4px;
+    opacity: 0.5;
+  }
+
+  .cursor-outline.hover {
+    width: 50px;
+    height: 50px;
+    background: rgba(0, 212, 255, 0.1);
+    border-color: var(--color-primary);
+  }
+
+  /* Hide real cursor on desktop */
+  @media (any-hover: hover) {
+    * {
+      cursor: none !important;
+    }
+    
+    a, button, .btn {
+      cursor: none !important;
+    }
+  }
+</style>

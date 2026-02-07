@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
+  <rect width="512" height="512" rx="80" fill="#0f0f0f"/>
+  <text x="256" y="185" text-anchor="middle" fill="#00d4ff" font-family="monospace" font-size="100" font-weight="bold">&lt;</text>
+  <text x="256" y="310" text-anchor="middle" font-family="sans-serif" font-size="130" font-weight="800">
+    <tspan fill="#00d4ff">M</tspan><tspan fill="#7c3aed">A</tspan>
+  </text>
+  <text x="256" y="435" text-anchor="middle" fill="#00d4ff" font-family="monospace" font-size="100" font-weight="bold">/&gt;</text>
+</svg>

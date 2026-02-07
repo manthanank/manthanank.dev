@@ -1,0 +1,241 @@
+---
+import { ViewTransitions } from 'astro:transitions';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import SkipLink from '../components/SkipLink.astro';
+import BackToTop from '../components/BackToTop.astro';
+import CustomCursor from '../components/CustomCursor.astro';
+import PageTransition from '../components/PageTransition.astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  ogId?: string;
+}
+
+const { 
+  title, 
+  description = 'Manthan Ankolekar - Full Stack Developer Portfolio', 
+  image,
+  ogId 
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+
+// Handle dynamic OG image
+const autoId = Astro.url.pathname.replace(/^\/|\/$/g, '').split('/')[0] || 'home';
+const finalOgId = ogId || autoId;
+const finalOgImage = image || `/og/${finalOgId}.png`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <script is:inline>
+      const getTheme = () => {
+        if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+          return localStorage.getItem('theme');
+        }
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      };
+      document.documentElement.setAttribute('data-theme', getTheme());
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <meta name="author" content="Manthan Ankolekar" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Canonical -->
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL(finalOgImage, Astro.site)} />
+    <meta property="og:site_name" content="Manthan Ankolekar" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={canonicalURL} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={new URL(finalOgImage, Astro.site)} />
+    <meta name="twitter:creator" content="@manthan_ank" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#0f0f0f" />
+
+    <!-- RSS Feed -->
+    <link rel="alternate" type="application/rss+xml" title="Manthan Ankolekar - Blog" href="/rss.xml" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+    <!-- View Transitions -->
+    <ViewTransitions />
+
+    <script type="application/ld+json" is:inline set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Manthan Ankolekar",
+      "url": "https://manthanank.dev",
+      "image": "https://manthanank.dev/profile.jpg",
+      "sameAs": [
+        "https://github.com/manthanank",
+        "https://linkedin.com/in/manthanank",
+        "https://x.com/manthan_ank"
+      ],
+      "jobTitle": "Full Stack Developer",
+      "description": "Full Stack Developer specializing in building exceptional digital experiences with Angular, Node.js, and modern web technologies."
+    })} />
+
+    <script type="application/ld+json" is:inline set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Manthan Ankolekar | Portfolio",
+      "url": "https://manthanank.dev",
+      "description": "Full Stack Developer Portfolio showcasing projects and technical deep dives."
+    })} />
+
+    <title>{title}</title>
+
+    <!-- Analytics (Umami - privacy-friendly, self-hosted alternative) -->
+    <!-- Currently disabled: domain not resolving. Re-enable when Umami is set up correctly. -->
+    <!-- <script defer src="https://analytics.eu.umami.is/script.js" data-website-id="0c25f17e-9f35-466e-ae73-341d3cd4e0ae" is:inline></script> -->
+  </head>
+  <body>
+    <script is:inline>
+      // Register Service Worker for offline support
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+      }
+    </script>
+    <SkipLink />
+    <Header />
+    <main id="main-content">
+      <slot />
+    </main>
+    <Footer />
+    <BackToTop />
+    <CustomCursor />
+    <PageTransition />
+    <div class="noise-overlay"></div>
+    <script>
+      function initReveal() {
+        const observerOptions = {
+          threshold: 0.1,
+          rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('active');
+              // Optionally unobserve after revealing
+              // observer.unobserve(entry.target);
+            }
+          });
+        }, observerOptions);
+
+        const revealElements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+        revealElements.forEach((el) => observer.observe(el));
+      }
+
+      function initMagneticButtons() {
+        const buttons = document.querySelectorAll('.btn-magnetic');
+        
+        buttons.forEach((btn) => {
+          btn.addEventListener('mousemove', (e: any) => {
+            const rect = btn.getBoundingClientRect();
+            const x = e.clientX - rect.left - rect.width / 2;
+            const y = e.clientY - rect.top - rect.height / 2;
+            
+            // Limit the movement
+            const strength = 15;
+            const moveX = (x / rect.width) * strength;
+            const moveY = (y / rect.height) * strength;
+            
+            (btn as HTMLElement).style.transform = `translate(${moveX}px, ${moveY}px)`;
+          });
+          
+          btn.addEventListener('mouseleave', () => {
+            (btn as HTMLElement).style.transform = `translate(0px, 0px)`;
+          });
+        });
+      }
+
+      // Initial run
+      initReveal();
+      initCopyButtons();
+      initMagneticButtons();
+
+      // Run after view transitions
+      document.addEventListener('astro:after-swap', () => {
+        initReveal();
+        initCopyButtons();
+        initMagneticButtons();
+      });
+
+      function initCopyButtons() {
+        const codeBlocks = document.querySelectorAll('pre');
+        
+        codeBlocks.forEach((block) => {
+          // Check if button already exists
+          if (block.querySelector('.copy-code')) return;
+
+          // Set relative position if not set
+          if (window.getComputedStyle(block).position === 'static') {
+            block.style.position = 'relative';
+          }
+
+          const button = document.createElement('button');
+          button.className = 'copy-code';
+          button.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="copy-icon"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="check-icon" style="display:none;"><polyline points="20 6 9 17 4 12"/></svg>
+          `;
+          button.setAttribute('aria-label', 'Copy code to clipboard');
+          
+          block.appendChild(button);
+
+          button.addEventListener('click', async () => {
+            const code = block.querySelector('code')?.innerText || block.innerText;
+            
+            try {
+              await navigator.clipboard.writeText(code);
+              
+              button.classList.add('copied');
+              const copyIcon = button.querySelector('.copy-icon') as HTMLElement;
+              const checkIcon = button.querySelector('.check-icon') as HTMLElement;
+              
+              if (copyIcon && checkIcon) {
+                copyIcon.style.display = 'none';
+                checkIcon.style.display = 'block';
+                
+                setTimeout(() => {
+                  button.classList.remove('copied');
+                  copyIcon.style.display = 'block';
+                  checkIcon.style.display = 'none';
+                }, 2000);
+              }
+            } catch (err) {
+              console.error('Failed to copy!', err);
+            }
+          });
+        });
+      }
+
+      initCopyButtons();
+    </script>
+  </body>
+</html>

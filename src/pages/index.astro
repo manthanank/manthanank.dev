@@ -1,0 +1,568 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SkillBadge from '../components/SkillBadge.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import BlogCard from '../components/BlogCard.astro';
+import { getCollection } from 'astro:content';
+
+const skills = [
+  'Angular', 'React', 'Node.js', 'Express.js', 'TypeScript',
+  'JavaScript', 'MongoDB', 'HTML5', 'CSS3', 'SCSS',
+  'Git', 'REST APIs', 'RxJS', 'NgRx', 'Astro',
+];
+
+const fallbackFeaturedProjects = [
+  {
+    title: 'Learn Angular',
+    description: 'A comprehensive learning resource for Angular developers with examples, best practices, and hands-on projects.',
+    tags: ['Angular', 'TypeScript', 'RxJS'],
+    github: 'https://github.com/manthanank/learn-angular',
+    live: 'https://learn-angular.netlify.app',
+  },
+  {
+    title: 'Learn Node.js',
+    description: 'A curated learning resource for Node.js fundamentals, backend patterns, and real-world examples.',
+    tags: ['Node.js', 'JavaScript', 'Backend'],
+    github: 'https://github.com/manthanank/learn-nodejs',
+  },
+  {
+    title: 'manthanank.dev',
+    description: 'My portfolio site built with Astro for fast performance, SEO, and a modern UI.',
+    tags: ['Astro', 'TypeScript', 'CSS'],
+    github: 'https://github.com/manthanank/manthanank.dev',
+    live: 'https://manthanank.dev',
+  },
+];
+
+const GITHUB_TOKEN = import.meta.env.GITHUB_TOKEN;
+const GITHUB_USERNAME = 'manthanank';
+
+const query = `
+  query ($username: String!) {
+    user(login: $username) {
+      pinnedItems(first: 5, types: REPOSITORY) {
+        nodes {
+          ... on Repository {
+            name
+            description
+            url
+            homepageUrl
+            stargazerCount
+            languages(first: 3, orderBy: {field: SIZE, direction: DESC}) {
+              nodes {
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+// Get local projects logic for slug mapping
+const localProjects = await getCollection('projects');
+const projectSlugsMap = new Map(localProjects.map(p => [p.id, p.id]));
+const projectTitlesMap = new Map(localProjects.map(p => [p.data.title.toLowerCase(), p.id]));
+
+let featuredProjects: any[] = fallbackFeaturedProjects.map(p => ({
+  ...p,
+  slug: projectSlugsMap.get(p.title.toLowerCase().replace(/\s+/g, '-')) || projectTitlesMap.get(p.title.toLowerCase())
+}));
+
+try {
+  const res = await fetch('https://api.github.com/graphql', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${GITHUB_TOKEN}`,
+    },
+    body: JSON.stringify({
+      query,
+      variables: { username: GITHUB_USERNAME },
+    }),
+  });
+
+  if (res.ok) {
+    const { data } = await res.json();
+    const pinnedNodes = data?.user?.pinnedItems?.nodes;
+    
+    if (Array.isArray(pinnedNodes) && pinnedNodes.length > 0) {
+      featuredProjects = pinnedNodes.map((repo: any) => {
+        const title = repo.name.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
+        const slug = projectSlugsMap.get(repo.name.toLowerCase()) || projectTitlesMap.get(title.toLowerCase());
+        return {
+          title,
+          description: repo.description || 'A project built with modern web technologies.',
+          tags: repo.languages?.nodes.map((l: any) => l.name) || [],
+          github: repo.url,
+          live: repo.homepageUrl || undefined,
+          stars: repo.stargazerCount,
+          slug
+        };
+      });
+    }
+  }
+} catch (e) {
+  console.warn('Failed to fetch pinned GitHub repos, using fallback data.');
+}
+
+const DEVTO_USERNAME = 'manthan_ank';
+
+// Get local posts
+const localPosts = await getCollection('blog', ({ data }) => !data.draft);
+
+// Get Dev.to posts
+let devtoPosts = [];
+try {
+  const res = await fetch(`https://dev.to/api/articles?username=${DEVTO_USERNAME}`);
+  if (res.ok) {
+    const data = await res.json();
+    devtoPosts = data.map((article) => ({
+      data: {
+        title: article.title,
+        description: article.description,
+        pubDate: new Date(article.published_at),
+        tags: article.tag_list,
+      },
+      url: article.url,
+    }));
+  }
+} catch (e) {
+  console.warn('Failed to fetch posts from Dev.to');
+}
+
+// Combine and get latest 3
+const latestPosts = [
+  ...localPosts.map(post => ({
+    data: post.data,
+    url: `/blog/${post.id}`
+  })),
+  ...devtoPosts
+]
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3);
+---
+
+<BaseLayout title="Manthan Ankolekar | Full Stack Developer">
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container hero-content">
+      <div class="hero-text animate-fade-in">
+        <p class="hero-greeting">Hi, my name is</p>
+        <h1 class="hero-name">Manthan Ankolekar</h1>
+        <h2 class="hero-headline">I build things for the web.</h2>
+        <p class="hero-description">
+          I'm a <strong>Full Stack Developer</strong> specializing in building exceptional digital
+          experiences. Currently focused on creating accessible, scalable web applications
+          with <strong>Angular</strong>, <strong>Node.js</strong>, and modern web technologies.
+        </p>
+        <div class="hero-cta">
+          <a href="/projects" class="btn btn-primary btn-magnetic">View My Work</a>
+          <a href="/contact" class="btn btn-outline btn-magnetic">Get In Touch</a>
+          <a href="/resume.pdf" download class="btn btn-ghost">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+            Resume
+          </a>
+        </div>
+      </div>
+      <div class="hero-visual animate-fade-in animate-delay-2">
+        <div class="code-window">
+          <div class="code-header">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+            <span class="code-filename">developer.ts</span>
+          </div>
+          <pre class="code-body"><code id="typing-code"></code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    function initTypingAnimation() {
+      const codeElement = document.getElementById('typing-code');
+      if (!codeElement) return;
+
+      const codeHTML = `<span class="kw">const</span> <span class="var">developer</span> = {
+  <span class="key">name</span>: <span class="str">"Manthan Ankolekar"</span>,
+  <span class="key">role</span>: <span class="str">"Full Stack Developer"</span>,
+  <span class="key">skills</span>: [<span class="str">"Angular"</span>, <span class="str">"Node.js"</span>,
+           <span class="str">"TypeScript"</span>, <span class="str">"MongoDB"</span>],
+  <span class="key">passion</span>: <span class="str">"Building great UX"</span>,
+  <span class="key">coffee</span>: <span class="bool">true</span>,
+};`;
+      
+      // Split with tags preserved as atomic parts
+      const parts = codeHTML.match(/<[^>]+>|[^<]/g) || [];
+      let i = 0;
+
+      const typingSpeed = 30;
+
+      function type() {
+        if (i < parts.length) {
+          const part = parts[i];
+          codeElement.innerHTML += part;
+          i++;
+          
+          // If it's a tag, type next immediately, otherwise wait
+          if (part.startsWith('<')) {
+            type();
+          } else {
+            setTimeout(type, typingSpeed);
+          }
+        }
+      }
+
+      // Start typing after a delay
+      codeElement.innerHTML = "";
+      setTimeout(type, 1000);
+
+      // Click listener for code interactive elements
+      codeElement.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement;
+        if (target.classList.contains('bool')) {
+          const isTrue = target.innerText === 'true';
+          target.innerText = isTrue ? 'false' : 'true';
+          target.style.color = isTrue ? '#f38ba8' : '#fab387'; // Red for false, Peach for true
+          
+          // Personality touch: Toggle a status icon if it exists
+          const pulse = document.querySelector('.pulse-icon') as HTMLElement;
+          if (pulse) {
+            pulse.style.background = isTrue ? '#f38ba8' : '#a6e3a1';
+            pulse.style.opacity = isTrue ? '0.5' : '1';
+          }
+        }
+      });
+    }
+
+    // Run on load
+    initTypingAnimation();
+
+    // Run after view transitions
+    document.addEventListener('astro:after-swap', initTypingAnimation);
+  </script>
+  <!-- Skills Section -->
+  <section class="section skills-section">
+    <div class="container">
+      <h2 class="section-title">Technologies I Work With</h2>
+      <p class="section-subtitle">My core tech stack and tools I use daily</p>
+      <div class="skills-grid reveal">
+        {skills.map((skill, index) => (
+          <div class={`reveal reveal-delay-${(index % 5) + 1}`}>
+            <SkillBadge name={skill} />
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Projects -->
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title">Featured Projects</h2>
+      <p class="section-subtitle">Some of the things I've built recently</p>
+      <div class="projects-grid">
+        {featuredProjects.map((project, index) => (
+          <div class={`reveal reveal-delay-${(index % 3) + 1}`}>
+            <ProjectCard {...project} />
+          </div>
+        ))}
+      </div>
+      <div class="view-all">
+        <a href="/projects" class="btn btn-outline">View All Projects</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Latest Blog Posts -->
+  {latestPosts.length > 0 && (
+    <section class="section blog-preview-section">
+      <div class="container">
+        <h2 class="section-title">Latest Articles</h2>
+        <p class="section-subtitle">Recent posts from my blog</p>
+        <div class="blog-preview-grid">
+          {latestPosts.map((post, index) => (
+            <div class={`reveal reveal-delay-${(index % 3) + 1}`}>
+              <BlogCard
+                title={post.data.title}
+                excerpt={post.data.description}
+                date={post.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                tags={post.data.tags}
+                url={post.url}
+              />
+            </div>
+          ))}
+        </div>
+        <div class="view-all">
+          <a href="/blog" class="btn btn-outline">View All Posts</a>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- CTA Section -->
+  <section class="section cta-section">
+    <div class="container cta-content">
+      <h2 class="cta-title">Interested in working together?</h2>
+      <p class="cta-text">
+        I'm always open to discussing new projects, creative ideas, or opportunities to be part of your visions.
+      </p>
+      <a href="/contact" class="btn btn-primary">Say Hello</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* ===== Hero ===== */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding-top: 70px;
+  }
+
+  .hero-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+
+  .hero-greeting {
+    font-family: var(--font-mono);
+    color: var(--color-primary);
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .hero-name {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #fff, var(--color-text));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero-headline {
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    font-weight: 700;
+    color: var(--color-text-muted);
+    margin-bottom: 1.25rem;
+  }
+
+  .hero-description {
+    color: var(--color-text-muted);
+    font-size: 1.05rem;
+    max-width: 520px;
+    margin-bottom: 2rem;
+    line-height: 1.8;
+  }
+
+  .hero-description strong {
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.75rem 1.25rem;
+    color: var(--color-text-muted);
+    font-weight: 500;
+    font-size: 0.9rem;
+    border-radius: 50px;
+    transition: all var(--transition);
+  }
+
+  .btn-ghost:hover {
+    color: var(--color-primary);
+    background: rgba(0, 212, 255, 0.06);
+  }
+
+  /* ===== Code Window ===== */
+  .code-window {
+    background: #1e1e2e;
+    border-radius: var(--radius);
+    border: 1px solid var(--color-border);
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.75rem 1rem;
+    background: #181825;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .dot.red { background: #f38ba8; }
+  .dot.yellow { background: #f9e2af; }
+  .dot.green { background: #a6e3a1; }
+
+  .code-filename {
+    margin-left: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+  }
+
+  .code-body {
+    padding: 1.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    line-height: 1.8;
+    overflow-x: auto;
+    color: #cdd6f4; /* Force light text color for dark code window */
+  }
+
+  .code-body .kw { color: #cba6f7; }
+  .code-body .var { color: #89b4fa; }
+  .code-body .key { color: #89dceb; }
+  .code-body .str { color: #a6e3a1; }
+  .code-body .bool { color: #fab387; }
+
+  /* ===== Skills ===== */
+  .skills-section {
+    background: var(--color-bg-alt);
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .skills-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+  }
+
+  /* ===== Projects ===== */
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+    gap: 1.5rem;
+  }
+
+  .view-all {
+    text-align: center;
+    margin-top: 3rem;
+  }
+
+  /* ===== Blog Preview ===== */
+  .blog-preview-section {
+    background: var(--color-bg-alt);
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .blog-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+    gap: 1.5rem;
+  }
+
+  /* ===== CTA ===== */
+  .cta-section {
+    text-align: center;
+  }
+
+  .cta-content {
+    max-width: 600px;
+  }
+
+  .cta-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, var(--color-gradient-start), var(--color-gradient-end));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .cta-text {
+    color: var(--color-text-muted);
+    font-size: 1.05rem;
+    margin-bottom: 2rem;
+    line-height: 1.7;
+  }
+
+  @media (max-width: 768px) {
+    .hero {
+      min-height: auto;
+      padding-top: 100px;
+      padding-bottom: 2rem;
+    }
+
+    .hero-content {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+      text-align: center;
+    }
+
+    .hero-description {
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero-cta {
+      justify-content: center;
+    }
+
+    .hero-visual {
+      order: -1;
+      display: none;
+    }
+
+    .code-window {
+      animation: none;
+    }
+
+    .code-body {
+      font-size: 0.75rem;
+      padding: 1rem;
+    }
+
+    .projects-grid,
+    .blog-preview-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero-cta {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .hero-cta .btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .hero-cta .btn-ghost {
+      width: auto;
+    }
+  }
+</style>

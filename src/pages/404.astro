@@ -1,0 +1,80 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="404: Page Not Found | Manthan Ankolekar">
+  <div class="error-page">
+    <div class="container error-content">
+      <div class="error-visual reveal">
+        <span class="error-code">404</span>
+        <div class="error-circle"></div>
+      </div>
+      <h1 class="reveal reveal-delay-1">Looks like you're lost.</h1>
+      <p class="reveal reveal-delay-2">
+        The page you're looking for doesn't exist or has been moved. 
+        Don't worry, even the best developers hit a bug sometimes.
+      </p>
+      <div class="reveal reveal-delay-3">
+        <a href="/" class="btn btn-primary">Back to Home</a>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .error-page {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding-top: 100px;
+  }
+
+  .error-content {
+    max-width: 600px;
+  }
+
+  .error-visual {
+    position: relative;
+    margin-bottom: 2rem;
+    display: inline-block;
+  }
+
+  .error-code {
+    font-size: clamp(5rem, 15vw, 10rem);
+    font-weight: 800;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    position: relative;
+    z-index: 2;
+  }
+
+  .error-circle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 150%;
+    height: 150%;
+    background: radial-gradient(circle, rgba(0, 212, 255, 0.1) 0%, rgba(0, 212, 255, 0) 70%);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--color-text);
+  }
+
+  p {
+    font-size: 1.1rem;
+    color: var(--color-text-muted);
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
+  }
+</style>

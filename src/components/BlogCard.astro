@@ -1,0 +1,151 @@
+---
+interface Props {
+  title: string;
+  excerpt: string;
+  date: string;
+  tags: string[];
+  url: string;
+}
+
+const { title, excerpt, date, tags, url } = Astro.props;
+const isExternal = url.startsWith('http');
+---
+
+<article class="blog-card" data-tilt>
+  <div class="blog-meta">
+    <time class="blog-date">{date}</time>
+    <div class="blog-tags">
+      {tags.map((tag) => (
+        <span class="blog-tag">{tag}</span>
+      ))}
+    </div>
+  </div>
+  <h3 class="blog-title">
+    <a href={url} {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>{title}</a>
+  </h3>
+  <p class="blog-excerpt">{excerpt}</p>
+  <a href={url} {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})} class="read-more">
+    Read more
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+  </a>
+</article>
+
+<style>
+  .blog-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 1.75rem;
+    transition: all var(--transition);
+  }
+
+  .blog-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--color-accent);
+    box-shadow: 0 10px 40px rgba(124, 58, 237, 0.1);
+  }
+
+  .blog-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .blog-date {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+  }
+
+  .blog-tags {
+    display: flex;
+    gap: 0.4rem;
+  }
+
+  .blog-tag {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-accent-light);
+    background: rgba(124, 58, 237, 0.1);
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+  }
+
+  .blog-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+  }
+
+  .blog-title a {
+    color: var(--color-text);
+    transition: color var(--transition);
+  }
+
+  .blog-title a:hover {
+    color: var(--color-primary);
+  }
+
+  .blog-excerpt {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 1.25rem;
+  }
+
+  .read-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    transition: gap var(--transition);
+  }
+
+  .read-more:hover {
+    gap: 0.75rem;
+  }
+
+  /* 3D Tilt Styles */
+  .blog-card[data-tilt] {
+    transform-style: preserve-3d;
+    perspective: 1000px;
+  }
+</style>
+
+<script>
+  function initBlogTilt() {
+    const cards = document.querySelectorAll('.blog-card[data-tilt]');
+    
+    cards.forEach(card => {
+      const maxTilt = 6;
+      
+      card.addEventListener('mousemove', (e: any) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        const tiltX = ((y - centerY) / centerY) * maxTilt;
+        const tiltY = ((centerX - x) / centerX) * maxTilt;
+        
+        (card as HTMLElement).style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(1.02)`;
+      });
+      
+      card.addEventListener('mouseleave', () => {
+        (card as HTMLElement).style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+      });
+    });
+  }
+  
+  initBlogTilt();
+  document.addEventListener('astro:after-swap', initBlogTilt);
+</script>

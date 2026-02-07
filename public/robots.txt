@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://manthanank.dev/sitemap-index.xml

@@ -1,0 +1,503 @@
+---
+---
+
+<div id="command-palette" class="command-palette" aria-hidden="true" role="dialog" aria-modal="true">
+  <div class="palette-overlay"></div>
+  <div class="palette-modal">
+    <div class="palette-header">
+      <div class="palette-input-wrapper">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="palette-icon"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input 
+          type="text" 
+          id="palette-input" 
+          placeholder="Type a command or search..." 
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <div class="palette-meta">
+          <kbd class="palette-kbd">ESC</kbd>
+        </div>
+      </div>
+    </div>
+    
+    <div id="palette-results" class="palette-results">
+      <!-- Results will be injected here -->
+    </div>
+
+    <div class="palette-footer">
+      <div class="palette-hints">
+        <span><kbd>↑↓</kbd> to navigate</span>
+        <span><kbd>↵</kbd> to select</span>
+        <span><kbd>⌘K</kbd> to open</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<button id="palette-trigger" class="palette-trigger" aria-label="Open Command Palette">
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+  <span class="trigger-label">Search</span>
+  <kbd class="trigger-kbd">⌘K</kbd>
+</button>
+
+<script>
+  import Fuse from 'fuse.js';
+
+  interface PaletteItem {
+    title: string;
+    description: string;
+    url?: string;
+    action?: string;
+    type: 'action' | 'page' | 'project' | 'blog';
+    category?: string;
+  }
+
+  const staticActions: PaletteItem[] = [
+    { title: 'Home', description: 'Go to homepage', url: '/', type: 'page', category: 'Pages' },
+    { title: 'About', description: 'Learn more about me', url: '/about', type: 'page', category: 'Pages' },
+    { title: 'Projects', description: 'View my work', url: '/projects', type: 'page', category: 'Pages' },
+    { title: 'Blog', description: 'Read my articles', url: '/blog', type: 'page', category: 'Pages' },
+    { title: 'Contact', description: 'Get in touch', url: '/contact', type: 'page', category: 'Pages' },
+    { title: 'Switch to Dark Mode', description: 'Change theme to dark', action: 'theme-dark', type: 'action', category: 'Actions' },
+    { title: 'Switch to Light Mode', description: 'Change theme to light', action: 'theme-light', type: 'action', category: 'Actions' },
+    { title: 'Download Resume', description: 'Get a copy of my CV', action: 'resume-download', type: 'action', category: 'Actions' },
+  ];
+
+  let dynamicItems: PaletteItem[] = [];
+  let fuse: Fuse<PaletteItem> | null = null;
+  
+  const palette = document.getElementById('command-palette');
+  const overlay = palette?.querySelector('.palette-overlay');
+  const input = document.getElementById('palette-input') as HTMLInputElement;
+  const resultsList = document.getElementById('palette-results');
+  const trigger = document.getElementById('palette-trigger');
+
+  async function loadIndex() {
+    try {
+      const res = await fetch('/search.json');
+      const data = await res.json();
+      dynamicItems = data.map((item: any) => ({
+        ...item,
+        category: item.type === 'project' ? 'Projects' : 'Blog'
+      }));
+      
+      const allItems = [...staticActions, ...dynamicItems];
+      fuse = new Fuse(allItems, {
+        keys: ['title', 'description', 'category'],
+        threshold: 0.3,
+        includeMatches: true
+      });
+      
+      renderResults(allItems); // Initial view
+    } catch (e) {
+      console.error('Palette index load failed');
+      fuse = new Fuse(staticActions, { keys: ['title'], threshold: 0.3 });
+      renderResults(staticActions);
+    }
+  }
+
+  function togglePalette(show: boolean) {
+    if (show) {
+      palette?.classList.add('open');
+      palette?.setAttribute('aria-hidden', 'false');
+      
+      // Guaranteed focus after animation starts
+      requestAnimationFrame(() => {
+        setTimeout(() => input?.focus(), 50);
+      });
+
+      document.body.style.overflow = 'hidden';
+      if (!fuse) loadIndex();
+    } else {
+      palette?.classList.remove('open');
+      palette?.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      if (input) input.value = '';
+      renderResults([...staticActions, ...dynamicItems]);
+    }
+  }
+
+  function renderResults(items: PaletteItem[]) {
+    if (!resultsList) return;
+
+    if (items.length === 0) {
+      resultsList.innerHTML = '<div class="palette-empty">No results found</div>';
+      return;
+    }
+
+    // Group by category
+    const grouped = items.reduce((acc, item) => {
+      const cat = item.category || 'Other';
+      if (!acc[cat]) acc[cat] = [];
+      acc[cat].push(item);
+      return acc;
+    }, {} as Record<string, PaletteItem[]>);
+
+    let html = '';
+    const categories = ['Actions', 'Pages', 'Projects', 'Blog'];
+    
+    categories.forEach(cat => {
+      if (grouped[cat]) {
+        html += `<div class="palette-category">${cat}</div>`;
+        grouped[cat].forEach((item, idx) => {
+          const isAction = item.type === 'action';
+          const link = isAction ? '#' : item.url;
+          const icon = getIcon(item.type);
+          
+          html += `
+            <a href="${link}" class="palette-item" data-action="${item.action || ''}" data-type="${item.type}">
+              <div class="item-icon">${icon}</div>
+              <div class="item-content">
+                <div class="item-title">${item.title}</div>
+                <div class="item-desc">${item.description}</div>
+              </div>
+              <div class="item-shortcut">↵</div>
+            </a>
+          `;
+        });
+      }
+    });
+
+    resultsList.innerHTML = html;
+
+    // Add click listeners to actions
+    resultsList.querySelectorAll('.palette-item[data-action]').forEach(el => {
+      el.addEventListener('click', (e) => {
+        const action = (el as HTMLElement).dataset.action;
+        if (action) {
+          e.preventDefault();
+          handleAction(action);
+        }
+      });
+    });
+  }
+
+  function getIcon(type: string) {
+    switch(type) {
+      case 'action': return '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>';
+      case 'page': return '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>';
+      case 'project': return '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>';
+      case 'blog': return '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>';
+      default: return '•';
+    }
+  }
+
+  function handleAction(action: string) {
+    togglePalette(false);
+    switch(action) {
+      case 'theme-dark':
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+        break;
+      case 'theme-light':
+        document.documentElement.setAttribute('data-theme', 'light');
+        localStorage.setItem('theme', 'light');
+        break;
+      case 'resume-download':
+        const link = document.createElement('a');
+        link.href = '/resume.pdf';
+        link.download = 'Manthan_Ankolekar_Resume.pdf';
+        link.click();
+        break;
+    }
+  }
+
+  // Keyboard Navigation
+  window.addEventListener('keydown', (e) => {
+    // Open shortcuts
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      togglePalette(true);
+    }
+    if (e.key === '/' && !palette?.classList.contains('open') && document.activeElement?.tagName !== 'INPUT') {
+      e.preventDefault();
+      togglePalette(true);
+    }
+
+    if (!palette?.classList.contains('open')) return;
+
+    if (e.key === 'Escape') togglePalette(false);
+
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      const items = Array.from(resultsList?.querySelectorAll('.palette-item') || []);
+      if (items.length === 0) return;
+
+      const current = document.activeElement as HTMLElement;
+      let nextIndex = 0;
+
+      if (items.includes(current as any)) {
+        const currentIndex = items.indexOf(current as any);
+        nextIndex = e.key === 'ArrowDown' 
+          ? (currentIndex + 1) % items.length 
+          : (currentIndex - 1 + items.length) % items.length;
+      } else {
+        nextIndex = e.key === 'ArrowDown' ? 0 : items.length - 1;
+      }
+      (items[nextIndex] as HTMLElement).focus();
+    }
+  });
+
+  input?.addEventListener('input', (e) => {
+    const val = (e.target as HTMLInputElement).value;
+    if (!val) {
+      renderResults([...staticActions, ...dynamicItems]);
+      return;
+    }
+    const results = fuse?.search(val).map(r => r.item) || [];
+    renderResults(results);
+  });
+
+  overlay?.addEventListener('click', () => togglePalette(false));
+  trigger?.addEventListener('click', () => togglePalette(true));
+
+  document.addEventListener('astro:after-swap', () => {
+    if (palette?.classList.contains('open')) togglePalette(false);
+  });
+</script>
+
+<style>
+  .command-palette {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 15vh;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .command-palette.open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .palette-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(8px);
+  }
+
+  .palette-modal {
+    position: relative;
+    width: 100%;
+    max-width: 650px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    transform: scale(0.95) translateY(-20px);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    margin: 0 1rem;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    max-height: 70vh;
+  }
+
+  .command-palette.open .palette-modal {
+    transform: scale(1) translateY(0);
+  }
+
+  .palette-header {
+    padding: 1rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .palette-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: var(--color-bg-alt);
+    padding: 0.75rem 1.25rem;
+    border-radius: 12px;
+    border: 1px solid var(--color-border);
+    transition: border-color 0.2s ease;
+  }
+
+  .palette-input-wrapper:focus-within {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 1px var(--color-primary);
+  }
+
+  .palette-icon {
+    color: var(--color-primary);
+    opacity: 0.8;
+  }
+
+  #palette-input {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--color-text);
+    font-size: 1.1rem;
+    outline: none;
+    width: 100%;
+  }
+
+  .palette-kbd {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+  }
+
+  .palette-results {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem;
+    overscroll-behavior: contain;
+  }
+
+  .palette-category {
+    padding: 1rem 0.75rem 0.5rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-primary);
+    opacity: 0.7;
+  }
+
+  .palette-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.85rem 1rem;
+    border-radius: 10px;
+    color: var(--color-text);
+    text-decoration: none;
+    transition: all 0.15s ease;
+    outline: none;
+  }
+
+  .palette-item:hover,
+  .palette-item:focus {
+    background: rgba(0, 212, 255, 0.08);
+  }
+
+  .item-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: var(--color-bg-alt);
+    border-radius: 8px;
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
+  }
+
+  .palette-item:hover .item-icon,
+  .palette-item:focus .item-icon {
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+
+  .item-content {
+    flex: 1;
+  }
+
+  .item-title {
+    font-weight: 500;
+    font-size: 0.95rem;
+    margin-bottom: 2px;
+  }
+
+  .item-desc {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+  }
+
+  .item-shortcut {
+    opacity: 0;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    transition: opacity 0.2s ease;
+  }
+
+  .palette-item:hover .item-shortcut,
+  .palette-item:focus .item-shortcut {
+    opacity: 1;
+  }
+
+  .palette-footer {
+    padding: 1rem;
+    background: var(--color-bg-alt);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .palette-hints {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+  }
+
+  .palette-hints kbd {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    padding: 1px 5px;
+    border-radius: 4px;
+    margin-right: 4px;
+    font-family: var(--font-mono);
+  }
+
+  /* Trigger Button */
+  .palette-trigger {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.45rem 1rem;
+    background: var(--color-bg-alt);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: all var(--transition);
+    font-family: inherit;
+  }
+
+  .palette-trigger:hover {
+    border-color: var(--color-primary);
+    background: rgba(0, 212, 255, 0.05);
+    color: var(--color-text);
+  }
+
+  .trigger-kbd {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    padding: 0 6px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
+  }
+
+  @media (max-width: 768px) {
+    .trigger-label, .trigger-kbd {
+      display: none;
+    }
+    .palette-trigger {
+      padding: 0.5rem;
+      width: 38px;
+      height: 38px;
+      justify-content: center;
+      border-radius: 50%;
+    }
+    .palette-hints {
+      display: none;
+    }
+    .palette-modal {
+      max-height: 80vh;
+      padding-top: 0;
+    }
+  }
+</style>
