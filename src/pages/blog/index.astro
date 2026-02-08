@@ -2,6 +2,10 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import BlogCard from '../../components/BlogCard.astro';
 import { getCollection } from 'astro:content';
+import { getLangFromUrl, useTranslations, getLocalizedPath } from '../../i18n/index';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
 
 const DEVTO_USERNAME = 'manthanank';
 
@@ -49,11 +53,11 @@ const posts = [
 ].sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 ---
 
-<BaseLayout title="Blog | Manthan Ankolekar" description="Technical articles and tutorials by Manthan Ankolekar on Angular, Node.js, TypeScript, and web development.">
+<BaseLayout title={`${t('blog.heroTitle')} | Manthan Ankolekar`} description={t('blog.heroSubtitle')}>
   <section class="section blog-hero">
     <div class="container">
-      <h1 class="section-title">Blog</h1>
-      <p class="section-subtitle">Thoughts, tutorials, and insights on web development</p>
+      <h1 class="section-title">{t('blog.heroTitle')}</h1>
+      <p class="section-subtitle">{t('blog.heroSubtitle')}</p>
     </div>
   </section>
 
@@ -63,18 +67,18 @@ const posts = [
         <BlogCard
           title={post.data.title}
           excerpt={post.data.description}
-          date={post.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+          date={post.data.pubDate.toLocaleDateString(lang === 'hi' ? 'hi-IN' : 'en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
           tags={post.data.tags}
-          url={post.url}
+          url={post.isExternal ? post.url : getLocalizedPath(post.url, lang)}
           readingTime={post.readingTime}
         />
       ))}
     </div>
 
     <div class="blog-cta">
-      <p>I also write on Medium about web development topics.</p>
+      <p>{t('blog.mediumCta')}</p>
       <a href="https://medium.com/@manthanank" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
-        Read More on Medium
+        {t('blog.readMedium')}
       </a>
     </div>
   </section>

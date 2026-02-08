@@ -1,21 +1,24 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getLangFromUrl, useTranslations, getLocalizedPath } from '../i18n/index';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
 ---
 
-<BaseLayout title="404: Page Not Found | Manthan Ankolekar">
+<BaseLayout title={`${t('404.title')} | Manthan Ankolekar`}>
   <div class="error-page">
     <div class="container error-content">
       <div class="error-visual reveal">
         <span class="error-code">404</span>
         <div class="error-circle"></div>
       </div>
-      <h1 class="reveal reveal-delay-1">Looks like you're lost.</h1>
+      <h1 class="reveal reveal-delay-1">{t('404.title')}</h1>
       <p class="reveal reveal-delay-2">
-        The page you're looking for doesn't exist or has been moved. 
-        Don't worry, even the best developers hit a bug sometimes.
+        {t('404.description')}
       </p>
       <div class="reveal reveal-delay-3">
-        <a href="/" class="btn btn-primary">Back to Home</a>
+        <a href={getLocalizedPath('/', lang)} class="btn btn-primary">{t('404.goHome')}</a>
       </div>
     </div>
   </div>

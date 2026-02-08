@@ -1,23 +1,26 @@
 ---
 import ThemeToggle from './ThemeToggle.astro';
 import CommandPalette from './CommandPalette.astro';
-// import LanguageSwitcher from './LanguageSwitcher.astro'; // i18n disabled for now
+import LanguageSwitcher from './LanguageSwitcher.astro';
+import { getLangFromUrl, useTranslations, getLocalizedPath } from '../i18n/index';
 
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
 const currentPath = Astro.url.pathname;
 
 const navLinks = [
-  { href: '/', label: 'Home' },
-  { href: '/about', label: 'About' },
-  { href: '/projects', label: 'Projects' },
-  { href: '/blog', label: 'Blog' },
-  { href: '/contact', label: 'Contact' },
+  { href: '/', label: t('nav.home') },
+  { href: '/about', label: t('nav.about') },
+  { href: '/projects', label: t('nav.projects') },
+  { href: '/blog', label: t('nav.blog') },
+  { href: '/contact', label: t('nav.contact') },
 ];
 ---
 
 <header class="header">
   <nav class="container nav">
     <div class="nav-left">
-      <a href="/" class="logo">
+      <a href={getLocalizedPath('/', lang)} class="logo">
         <span class="logo-bracket">&lt;</span>
         <span class="logo-name">MA</span>
         <span class="logo-bracket">/&gt;</span>
@@ -29,8 +32,8 @@ const navLinks = [
         {navLinks.map((link) => (
           <li>
             <a
-              href={link.href}
-              class:list={['nav-link', { active: currentPath === link.href || (link.href !== '/' && currentPath.startsWith(link.href)) }]}
+              href={getLocalizedPath(link.href, lang)}
+              class:list={['nav-link', { active: currentPath === getLocalizedPath(link.href, lang) || (link.href !== '/' && currentPath.startsWith(getLocalizedPath(link.href, lang))) }]}
             >
               {link.label}
             </a>
@@ -40,7 +43,7 @@ const navLinks = [
       
       <div class="nav-actions">
         <CommandPalette />
-        <!-- <LanguageSwitcher /> i18n disabled for now -->
+        <LanguageSwitcher currentLang={lang} />
         <ThemeToggle />
         <button class="mobile-toggle" aria-label="Toggle navigation" id="mobile-toggle">
           <span class="bar"></span>

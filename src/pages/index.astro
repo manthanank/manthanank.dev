@@ -4,6 +4,10 @@ import SkillBadge from '../components/SkillBadge.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import BlogCard from '../components/BlogCard.astro';
 import { getCollection } from 'astro:content';
+import { getLangFromUrl, useTranslations, getLocalizedPath } from '../i18n/index';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
 
 const skills = [
   'Angular', 'React', 'Node.js', 'Express.js', 'TypeScript',
@@ -144,25 +148,22 @@ const latestPosts = [
   .slice(0, 3);
 ---
 
-<BaseLayout title="Manthan Ankolekar | Full Stack Developer">
+<BaseLayout title={`Manthan Ankolekar | ${t('hero.role')}`}>
   <!-- Hero Section -->
   <section class="hero">
     <div class="container hero-content">
       <div class="hero-text animate-fade-in">
-        <p class="hero-greeting">Hi, my name is</p>
-        <h1 class="hero-name">Manthan Ankolekar</h1>
-        <h2 class="hero-headline">I build things for the web.</h2>
-        <p class="hero-description">
-          I'm a <strong>Full Stack Developer</strong> specializing in building exceptional digital
-          experiences. Currently focused on creating accessible, scalable web applications
-          with <strong>Angular</strong>, <strong>Node.js</strong>, and modern web technologies.
+        <p class="hero-greeting">{t('hero.greeting')}</p>
+        <h1 class="hero-name">{t('hero.name')}</h1>
+        <h2 class="hero-headline">{t('hero.headline')}</h2>
+        <p class="hero-description" set:html={t('hero.description')}>
         </p>
         <div class="hero-cta">
-          <a href="/projects" class="btn btn-primary btn-magnetic">View My Work</a>
-          <a href="/contact" class="btn btn-outline btn-magnetic">Get In Touch</a>
+          <a href={getLocalizedPath('/projects', lang)} class="btn btn-primary btn-magnetic">{t('hero.viewWork')}</a>
+          <a href={getLocalizedPath('/contact', lang)} class="btn btn-outline btn-magnetic">{t('hero.getInTouch')}</a>
           <a href="/resume.pdf" download class="btn btn-ghost">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-            Resume
+            {t('hero.resume')}
           </a>
         </div>
       </div>
@@ -246,8 +247,8 @@ const latestPosts = [
   <!-- Skills Section -->
   <section class="section skills-section">
     <div class="container">
-      <h2 class="section-title">Technologies I Work With</h2>
-      <p class="section-subtitle">My core tech stack and tools I use daily</p>
+      <h2 class="section-title">{t('skills.title')}</h2>
+      <p class="section-subtitle">{t('skills.subtitle')}</p>
       <div class="skills-grid reveal">
         {skills.map((skill, index) => (
           <div class={`reveal reveal-delay-${(index % 5) + 1}`}>
@@ -261,8 +262,8 @@ const latestPosts = [
   <!-- Featured Projects -->
   <section class="section">
     <div class="container">
-      <h2 class="section-title">Featured Projects</h2>
-      <p class="section-subtitle">Some of the things I've built recently</p>
+      <h2 class="section-title">{t('projects.title')}</h2>
+      <p class="section-subtitle">{t('projects.subtitle')}</p>
       <div class="projects-grid">
         {featuredProjects.map((project, index) => (
           <div class={`reveal reveal-delay-${(index % 3) + 1}`}>
@@ -271,7 +272,7 @@ const latestPosts = [
         ))}
       </div>
       <div class="view-all">
-        <a href="/projects" class="btn btn-outline">View All Projects</a>
+        <a href={getLocalizedPath('/projects', lang)} class="btn btn-outline">{t('projects.viewAll')}</a>
       </div>
     </div>
   </section>
@@ -280,15 +281,15 @@ const latestPosts = [
   {latestPosts.length > 0 && (
     <section class="section blog-preview-section">
       <div class="container">
-        <h2 class="section-title">Latest Articles</h2>
-        <p class="section-subtitle">Recent posts from my blog</p>
+        <h2 class="section-title">{t('blog.title')}</h2>
+        <p class="section-subtitle">{t('blog.subtitle')}</p>
         <div class="blog-preview-grid">
           {latestPosts.map((post, index) => (
             <div class={`reveal reveal-delay-${(index % 3) + 1}`}>
               <BlogCard
                 title={post.data.title}
                 excerpt={post.data.description}
-                date={post.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                date={post.data.pubDate.toLocaleDateString(lang === 'hi' ? 'hi-IN' : 'en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                 tags={post.data.tags}
                 url={post.url}
               />
@@ -296,7 +297,7 @@ const latestPosts = [
           ))}
         </div>
         <div class="view-all">
-          <a href="/blog" class="btn btn-outline">View All Posts</a>
+          <a href={getLocalizedPath('/blog', lang)} class="btn btn-outline">{t('blog.viewAll')}</a>
         </div>
       </div>
     </section>
@@ -305,11 +306,11 @@ const latestPosts = [
   <!-- CTA Section -->
   <section class="section cta-section">
     <div class="container cta-content">
-      <h2 class="cta-title">Interested in working together?</h2>
+      <h2 class="cta-title">{t('cta.title')}</h2>
       <p class="cta-text">
-        I'm always open to discussing new projects, creative ideas, or opportunities to be part of your visions.
+        {t('cta.description')}
       </p>
-      <a href="/contact" class="btn btn-primary">Say Hello</a>
+      <a href={getLocalizedPath('/contact', lang)} class="btn btn-primary">{t('cta.button')}</a>
     </div>
   </section>
 </BaseLayout>

@@ -3,6 +3,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { Image } from 'astro:assets';
 import SkillBadge from '../components/SkillBadge.astro';
 import ExperienceItem from '../components/ExperienceItem.astro';
+import { getLangFromUrl, useTranslations, getLocalizedPath } from '../i18n/index';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
 
 const frontendSkills = ['Angular', 'React', 'TypeScript', 'JavaScript', 'HTML5', 'CSS3', 'SCSS', 'RxJS', 'NgRx', 'Astro'];
 const backendSkills = ['Node.js', 'Express.js', 'MongoDB', 'REST APIs', 'PostgreSQL', 'Firebase'];
@@ -102,9 +106,9 @@ try {
         relativeDate: commit?.committedDate ? (() => {
           const diff = Date.now() - new Date(commit.committedDate).getTime();
           const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-          if (days === 0) return 'Today';
-          if (days === 1) return 'Yesterday';
-          return `${days} days ago`;
+          if (days === 0) return t('date.today');
+          if (days === 1) return t('date.yesterday');
+          return `${days} ${t('date.daysAgo')}`;
         })() : null
       };
     }
@@ -115,25 +119,25 @@ try {
 
 const experience = [
   {
-    title: 'Full Stack Developer',
-    company: 'Freelance / Open Source',
+    title: t('exp.title1'),
+    company: t('exp.company1'),
     period: '2022 - Present',
     description: [
-      'Developed and maintained multiple open-source Angular projects and npm packages',
-      'Built full-stack web applications using the MEAN stack',
-      'Created educational content and learning resources for the Angular community',
-      'Contributed to open-source projects and maintained personal developer tools',
+      t('exp.desc1_1'),
+      t('exp.desc1_2'),
+      t('exp.desc1_3'),
+      t('exp.desc1_4'),
     ],
   },
   {
-    title: 'Software Developer',
-    company: 'Previous Company',
+    title: t('exp.title2'),
+    company: t('exp.company2'),
     period: '2020 - 2022',
     description: [
-      'Built responsive web applications using Angular and TypeScript',
-      'Developed RESTful APIs with Node.js and Express',
-      'Collaborated with cross-functional teams in an Agile environment',
-      'Improved application performance and code quality through refactoring',
+      t('exp.desc2_1'),
+      t('exp.desc2_2'),
+      t('exp.desc2_3'),
+      t('exp.desc2_4'),
     ],
   },
 ];
@@ -147,63 +151,49 @@ const {
 } = githubStats;
 ---
 
-<BaseLayout title="About | Manthan Ankolekar" description="Learn more about Manthan Ankolekar - a Full Stack Developer passionate about building modern web applications.">
+<BaseLayout title={`${t('about.title')} | Manthan Ankolekar`} description={t('about.subtitle')}>
   <section class="section about-hero">
     <div class="container">
-      <h1 class="section-title">About Me</h1>
-      <p class="section-subtitle">A bit about who I am and what I do</p>
+      <h1 class="section-title">{t('about.title')}</h1>
+      <p class="section-subtitle">{t('about.subtitle')}</p>
     </div>
   </section>
 
   <section class="container about-content">
     <div class="about-grid">
       <div class="about-text">
-        <h2>Hello! I'm Manthan.</h2>
-        <p>
-          I'm a passionate Full Stack Developer with a love for creating clean, efficient, and
-          user-friendly web applications. My journey in web development started with curiosity
-          about how websites work, and it has grown into a career building digital experiences
-          that make a difference.
-        </p>
-        <p>
-          I specialize in the <strong>Angular</strong> ecosystem and the <strong>MEAN stack</strong>,
-          but I'm always eager to learn new technologies and frameworks. I believe in writing
-          clean, maintainable code and following best practices that make applications scalable
-          and performant.
-        </p>
-        <p>
-          When I'm not coding, I enjoy contributing to open-source projects, writing technical
-          articles, and helping fellow developers learn and grow. I'm a strong advocate for
-          knowledge sharing and community building.
-        </p>
+        <h2>{t('about.hello')}</h2>
+        <p set:html={t('about.bio1')}></p>
+        <p set:html={t('about.bio2')}></p>
+        <p set:html={t('about.bio3')}></p>
         <div class="about-actions">
           <a href="/resume.pdf" download class="btn btn-primary">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-            Download Resume
+            {t('about.downloadResume')}
           </a>
-          <a href="/contact" class="btn btn-outline btn-magnetic">Get In Touch</a>
+          <a href={getLocalizedPath('/contact', lang)} class="btn btn-outline btn-magnetic">{t('contact.letsConnect')}</a>
         </div>
         <div class="about-stats">
           <div class="stat">
             <span class:list={["stat-number", { skeleton: !repos }]}>{repos || '80+'}</span>
-            <span class="stat-label">Repositories</span>
+            <span class="stat-label">{t('about.repositories')}</span>
           </div>
           <div class="stat">
             <span class:list={["stat-number", { skeleton: !stars }]}>{stars || '45'}</span>
-            <span class="stat-label">Total Stars</span>
+            <span class="stat-label">{t('about.totalStars')}</span>
           </div>
           <div class="stat">
             <span class:list={["stat-number", { skeleton: !commits }]}>{commits || '500+'}</span>
-            <span class="stat-label">Contributions</span>
+            <span class="stat-label">{t('about.contributions')}</span>
           </div>
           <div class="stat">
             <span class="stat-number">10+</span>
-            <span class="stat-label">npm Packages</span>
+            <span class="stat-label">{t('about.npmPackages')}</span>
           </div>
         </div>
         {githubStats.topLanguages.length > 0 && (
           <div class="top-stack">
-            <span class="stack-label">Top Stack:</span>
+            <span class="stack-label">{t('about.topStack')}</span>
             <div class="stack-list">
               {githubStats.topLanguages.map(lang => (
                 <span class="stack-item">{lang}</span>
@@ -215,7 +205,7 @@ const {
           <div class="live-activity reveal reveal-delay-2">
             <div class="activity-header">
               <span class="pulse-icon"></span>
-              <span class="activity-label">Live Activity</span>
+              <span class="activity-label">{t('about.liveActivity')}</span>
             </div>
             <div class="activity-card">
               <div class="activity-repo">
@@ -241,8 +231,8 @@ const {
             class="profile-img" 
           />
           <div class="profile-avatar-overlay">
-            <p class="avatar-name">Manthan Ankolekar</p>
-            <p class="avatar-role">Full Stack Developer</p>
+            <p class="avatar-name">{t('hero.name')}</p>
+            <p class="avatar-role">{t('hero.role')}</p>
             <div class="avatar-links">
               <a href="https://github.com/manthanank" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
@@ -263,24 +253,24 @@ const {
   <!-- Skills -->
   <section class="section skills-detail">
     <div class="container">
-      <h2 class="section-title">Skills & Technologies</h2>
-      <p class="section-subtitle">Technologies I've been working with</p>
-
+      <h2 class="section-title">{t('about.skillsTitle')}</h2>
+      <p class="section-subtitle">{t('about.skillsSubtitle')}</p>
+ 
       <div class="skills-categories">
         <div class="skill-category">
-          <h3 class="category-title">Frontend</h3>
+          <h3 class="category-title">{t('about.frontend')}</h3>
           <div class="skill-list">
             {frontendSkills.map((skill) => <SkillBadge name={skill} />)}
           </div>
         </div>
         <div class="skill-category">
-          <h3 class="category-title">Backend</h3>
+          <h3 class="category-title">{t('about.backend')}</h3>
           <div class="skill-list">
             {backendSkills.map((skill) => <SkillBadge name={skill} />)}
           </div>
         </div>
         <div class="skill-category">
-          <h3 class="category-title">Tools & Platforms</h3>
+          <h3 class="category-title">{t('about.tools')}</h3>
           <div class="skill-list">
             {toolsSkills.map((skill) => <SkillBadge name={skill} />)}
           </div>
@@ -292,8 +282,8 @@ const {
   <!-- Experience -->
   <section class="section">
     <div class="container">
-      <h2 class="section-title">Experience</h2>
-      <p class="section-subtitle">My professional journey</p>
+      <h2 class="section-title">{t('about.experienceTitle')}</h2>
+      <p class="section-subtitle">{t('about.experienceSubtitle')}</p>
       <div class="experience-timeline">
         <div class="timeline-track">
           <div class="timeline-progress"></div>

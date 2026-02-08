@@ -7,6 +7,7 @@ import BackToTop from '../components/BackToTop.astro';
 import CustomCursor from '../components/CustomCursor.astro';
 import PageTransition from '../components/PageTransition.astro';
 import '../styles/global.css';
+import { getLangFromUrl } from '../i18n/index';
 
 interface Props {
   title: string;
@@ -22,6 +23,7 @@ const {
   ogId 
 } = Astro.props;
 
+const lang = getLangFromUrl(Astro.url);
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
 // Handle dynamic OG image
@@ -31,7 +33,7 @@ const finalOgImage = image || `/og/${finalOgId}.png`;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={lang}>
   <head>
     <meta charset="UTF-8" />
     <script is:inline>

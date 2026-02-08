@@ -1,7 +1,24 @@
 ---
+import { getLangFromUrl, useTranslations, getLocalizedPath } from '../i18n/index';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
 ---
 
-<div id="command-palette" class="command-palette" aria-hidden="true" role="dialog" aria-modal="true">
+<div id="command-palette" 
+  class="command-palette" 
+  aria-hidden="true" 
+  role="dialog" 
+  aria-modal="true"
+  data-lang={lang}
+  data-t-placeholder={t('palette.placeholder')}
+  data-t-navigate={t('palette.navigate') || 'to navigate'}
+  data-t-select={t('palette.select') || 'to select'}
+  data-t-open={t('palette.open') || 'to open'}
+  data-t-no-results={t('palette.noResults')}
+  data-t-actions={t('palette.actions')}
+  data-t-pages={t('palette.pages')}
+>
   <div class="palette-overlay"></div>
   <div class="palette-modal">
     <div class="palette-header">
@@ -10,7 +27,7 @@
         <input 
           type="text" 
           id="palette-input" 
-          placeholder="Type a command or search..." 
+          placeholder={t('palette.placeholder')} 
           autocomplete="off"
           spellcheck="false"
         />
@@ -26,20 +43,19 @@
 
     <div class="palette-footer">
       <div class="palette-hints">
-        <span><kbd>↑↓</kbd> to navigate</span>
-        <span><kbd>↵</kbd> to select</span>
-        <span><kbd>⌘K</kbd> to open</span>
+        <span><kbd>↑↓</kbd> {t('palette.navigate') || 'to navigate'}</span>
+        <span><kbd>↵</kbd> {t('palette.select') || 'to select'}</span>
+        <span><kbd>⌘K</kbd> {t('palette.open') || 'to open'}</span>
       </div>
     </div>
   </div>
 </div>
 
-<button id="palette-trigger" class="palette-trigger" aria-label="Open Command Palette">
+<button id="palette-trigger" class="palette-trigger" aria-label={t('palette.placeholder')}>
   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-  <span class="trigger-label">Search</span>
+  <span class="trigger-label">{t('nav.search') || 'Search'}</span>
   <kbd class="trigger-kbd">⌘K</kbd>
 </button>
-
 <script>
   import Fuse from 'fuse.js';
 
@@ -53,28 +69,37 @@
     tags?: string[];
   }
 
+  const palette = document.getElementById('command-palette');
+  const lang = palette?.dataset.lang || 'en';
+  const tNoResults = palette?.dataset.tNoResults || 'No results found';
+  const tActions = palette?.dataset.tActions || 'Actions';
+  const tPages = palette?.dataset.tPages || 'Pages';
+
+  function getLocalizedUrl(path: string) {
+    if (lang === 'en') return path;
+    return `/${lang}${path === '/' ? '' : path}`;
+  }
+
   const staticActions: PaletteItem[] = [
-    { title: 'Home', description: 'Go to homepage', url: '/', type: 'page', category: 'Pages' },
-    { title: 'About', description: 'Learn more about me', url: '/about', type: 'page', category: 'Pages' },
-    { title: 'Projects', description: 'View my work', url: '/projects', type: 'page', category: 'Pages' },
-    { title: 'Blog', description: 'Read my articles', url: '/blog', type: 'page', category: 'Pages' },
-    { title: 'Contact', description: 'Get in touch', url: '/contact', type: 'page', category: 'Pages' },
-    { title: 'Switch to Dark Mode', description: 'Change theme to dark', action: 'theme-dark', type: 'action', category: 'Actions' },
-    { title: 'Switch to Light Mode', description: 'Change theme to light', action: 'theme-light', type: 'action', category: 'Actions' },
-    { title: 'Download Resume', description: 'Get a copy of my CV', action: 'resume-download', type: 'action', category: 'Actions' },
-    // { title: 'Toggle Language', description: 'Switch between English and Hindi', action: 'toggle-lang', type: 'action', category: 'Actions' }, // i18n disabled
+    { title: 'Home', description: 'Go to homepage', url: getLocalizedUrl('/'), type: 'page', category: tPages },
+    { title: 'About', description: 'Learn more about me', url: getLocalizedUrl('/about'), type: 'page', category: tPages },
+    { title: 'Projects', description: 'View my work', url: getLocalizedUrl('/projects'), type: 'page', category: tPages },
+    { title: 'Blog', description: 'Read my articles', url: getLocalizedUrl('/blog'), type: 'page', category: tPages },
+    { title: 'Contact', description: 'Get in touch', url: getLocalizedUrl('/contact'), type: 'page', category: tPages },
+    { title: 'Switch to Dark Mode', description: 'Change theme to dark', action: 'theme-dark', type: 'action', category: tActions },
+    { title: 'Switch to Light Mode', description: 'Change theme to light', action: 'theme-light', type: 'action', category: tActions },
+    { title: 'Download Resume', description: 'Get a copy of my CV', action: 'resume-download', type: 'action', category: tActions },
+    { title: 'Toggle Language', description: 'हिन्दी / English', action: 'toggle-lang', type: 'action', category: tActions },
   ];
 
   let dynamicItems: PaletteItem[] = [];
   let fuse: Fuse<PaletteItem> | null = null;
   
-  const palette = document.getElementById('command-palette');
   const overlay = palette?.querySelector('.palette-overlay');
   const input = document.getElementById('palette-input') as HTMLInputElement;
   const resultsList = document.getElementById('palette-results');
   const trigger = document.getElementById('palette-trigger');
 
-  // Enhanced Fuse.js configuration for better fuzzy search
   const fuseOptions: Fuse.IFuseOptions<PaletteItem> = {
     keys: [
       { name: 'title', weight: 0.4 },
@@ -82,15 +107,15 @@
       { name: 'category', weight: 0.15 },
       { name: 'tags', weight: 0.15 },
     ],
-    threshold: 0.4,              // Allow more fuzzy matches (0 = exact, 1 = match anything)
-    distance: 100,               // How close the match must be to the initial position
-    minMatchCharLength: 2,       // Minimum characters to start matching
-    includeMatches: true,        // Include matching indices for highlighting
-    includeScore: true,          // Include match score for sorting
-    shouldSort: true,            // Sort by score
-    findAllMatches: true,        // Don't stop at first match
-    ignoreLocation: true,        // Don't factor in location for better partial matches
-    useExtendedSearch: true,     // Enable extended search patterns
+    threshold: 0.4,
+    distance: 100,
+    minMatchCharLength: 2,
+    includeMatches: true,
+    includeScore: true,
+    shouldSort: true,
+    findAllMatches: true,
+    ignoreLocation: true,
+    useExtendedSearch: true,
   };
 
   async function loadIndex() {
@@ -105,9 +130,8 @@
       const allItems = [...staticActions, ...dynamicItems];
       fuse = new Fuse(allItems, fuseOptions);
       
-      renderResults(allItems); // Initial view
+      renderResults(allItems);
     } catch (e) {
-      console.error('Palette index load failed');
       fuse = new Fuse(staticActions, fuseOptions);
       renderResults(staticActions);
     }
@@ -117,12 +141,9 @@
     if (show) {
       palette?.classList.add('open');
       palette?.setAttribute('aria-hidden', 'false');
-      
-      // Guaranteed focus after animation starts
       requestAnimationFrame(() => {
         setTimeout(() => input?.focus(), 50);
       });
-
       document.body.style.overflow = 'hidden';
       if (!fuse) loadIndex();
     } else {
@@ -147,14 +168,12 @@
               <path d="M8 8h6"/>
             </svg>
           </div>
-          <p>No results found${searchQuery ? ` for "<strong>${searchQuery}</strong>"` : ''}</p>
-          <p style="font-size: 0.8rem; margin-top: 0.5rem; opacity: 0.7;">Try a different search term</p>
+          <p>${tNoResults}${searchQuery ? ` for "<strong>${searchQuery}</strong>"` : ''}</p>
         </div>
       `;
       return;
     }
 
-    // Group by category
     const grouped = items.reduce((acc, item) => {
       const cat = item.category || 'Other';
       if (!acc[cat]) acc[cat] = [];
@@ -163,20 +182,15 @@
     }, {} as Record<string, PaletteItem[]>);
 
     let html = '';
-    const categories = ['Actions', 'Pages', 'Projects', 'Blog'];
+    const categories = [tActions, tPages, 'Projects', 'Blog'];
     
     categories.forEach(cat => {
       if (grouped[cat]) {
         html += `<div class="palette-category">${cat}</div>`;
-        grouped[cat].forEach((item, idx) => {
+        grouped[cat].forEach((item) => {
           const isAction = item.type === 'action';
           const link = isAction ? '#' : item.url;
           const icon = getIcon(item.type);
-          
-          // Show tags if they exist
-          const tagsHtml = item.tags && item.tags.length > 0
-            ? `<div class="item-tags">${item.tags.slice(0, 3).map(tag => `<span class="item-tag">${tag}</span>`).join('')}</div>`
-            : '';
           
           html += `
             <a href="${link}" class="palette-item" data-action="${item.action || ''}" data-type="${item.type}">
@@ -184,7 +198,6 @@
               <div class="item-content">
                 <div class="item-title">${item.title}</div>
                 <div class="item-desc">${item.description}</div>
-                ${tagsHtml}
               </div>
               <div class="item-shortcut">↵</div>
             </a>
@@ -195,7 +208,6 @@
 
     resultsList.innerHTML = html;
 
-    // Add click listeners to actions
     resultsList.querySelectorAll('.palette-item[data-action]').forEach(el => {
       el.addEventListener('click', (e) => {
         const action = (el as HTMLElement).dataset.action;
@@ -235,25 +247,21 @@
         link.click();
         break;
       case 'toggle-lang':
-        // Toggle between English and Hindi
-        const currentLang = localStorage.getItem('preferred-lang') || 'en';
+        const currentLang = localStorage.getItem('preferred-lang') || lang || 'en';
         const newLang = currentLang === 'en' ? 'hi' : 'en';
         localStorage.setItem('preferred-lang', newLang);
         
-        // Redirect to the new language path
         const currentPath = window.location.pathname;
-        const pathWithoutLang = currentPath.startsWith('/hi/') 
+        const pathWithoutLang = currentPath.startsWith('/hi') 
           ? currentPath.slice(3) || '/'
           : currentPath;
-        const newPath = newLang === 'en' ? pathWithoutLang : `/hi${pathWithoutLang}`;
+        const newPath = newLang === 'en' ? pathWithoutLang : `/hi${pathWithoutLang === '/' ? '' : pathWithoutLang}`;
         window.location.href = newPath;
         break;
     }
   }
 
-  // Keyboard Navigation
   window.addEventListener('keydown', (e) => {
-    // Open shortcuts
     if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
       e.preventDefault();
       togglePalette(true);
