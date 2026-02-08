@@ -1,8 +1,4 @@
 ---
-import { getLangFromUrl, useTranslations, getLocalizedPath } from '../i18n/index';
-
-const lang = getLangFromUrl(Astro.url);
-const t = useTranslations(lang);
 ---
 
 <div id="command-palette" 
@@ -10,14 +6,6 @@ const t = useTranslations(lang);
   aria-hidden="true" 
   role="dialog" 
   aria-modal="true"
-  data-lang={lang}
-  data-t-placeholder={t('palette.placeholder')}
-  data-t-navigate={t('palette.navigate') || 'to navigate'}
-  data-t-select={t('palette.select') || 'to select'}
-  data-t-open={t('palette.open') || 'to open'}
-  data-t-no-results={t('palette.noResults')}
-  data-t-actions={t('palette.actions')}
-  data-t-pages={t('palette.pages')}
 >
   <div class="palette-overlay"></div>
   <div class="palette-modal">
@@ -27,7 +15,7 @@ const t = useTranslations(lang);
         <input 
           type="text" 
           id="palette-input" 
-          placeholder={t('palette.placeholder')} 
+          placeholder="Type a command or search..." 
           autocomplete="off"
           spellcheck="false"
         />
@@ -43,17 +31,17 @@ const t = useTranslations(lang);
 
     <div class="palette-footer">
       <div class="palette-hints">
-        <span><kbd>↑↓</kbd> {t('palette.navigate') || 'to navigate'}</span>
-        <span><kbd>↵</kbd> {t('palette.select') || 'to select'}</span>
-        <span><kbd>⌘K</kbd> {t('palette.open') || 'to open'}</span>
+        <span><kbd>↑↓</kbd> to navigate</span>
+        <span><kbd>↵</kbd> to select</span>
+        <span><kbd>⌘K</kbd> to open</span>
       </div>
     </div>
   </div>
 </div>
 
-<button id="palette-trigger" class="palette-trigger" aria-label={t('palette.placeholder')}>
+<button id="palette-trigger" class="palette-trigger" aria-label="Type a command or search...">
   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-  <span class="trigger-label">{t('nav.search') || 'Search'}</span>
+  <span class="trigger-label">Search</span>
   <kbd class="trigger-kbd">⌘K</kbd>
 </button>
 <script>
@@ -70,26 +58,19 @@ const t = useTranslations(lang);
   }
 
   const palette = document.getElementById('command-palette');
-  const lang = palette?.dataset.lang || 'en';
-  const tNoResults = palette?.dataset.tNoResults || 'No results found';
-  const tActions = palette?.dataset.tActions || 'Actions';
-  const tPages = palette?.dataset.tPages || 'Pages';
-
-  function getLocalizedUrl(path: string) {
-    if (lang === 'en') return path;
-    return `/${lang}${path === '/' ? '' : path}`;
-  }
+  const tNoResults = 'No results found';
+  const tActions = 'Actions';
+  const tPages = 'Pages';
 
   const staticActions: PaletteItem[] = [
-    { title: 'Home', description: 'Go to homepage', url: getLocalizedUrl('/'), type: 'page', category: tPages },
-    { title: 'About', description: 'Learn more about me', url: getLocalizedUrl('/about'), type: 'page', category: tPages },
-    { title: 'Projects', description: 'View my work', url: getLocalizedUrl('/projects'), type: 'page', category: tPages },
-    { title: 'Blog', description: 'Read my articles', url: getLocalizedUrl('/blog'), type: 'page', category: tPages },
-    { title: 'Contact', description: 'Get in touch', url: getLocalizedUrl('/contact'), type: 'page', category: tPages },
+    { title: 'Home', description: 'Go to homepage', url: '/', type: 'page', category: tPages },
+    { title: 'About', description: 'Learn more about me', url: '/about', type: 'page', category: tPages },
+    { title: 'Projects', description: 'View my work', url: '/projects', type: 'page', category: tPages },
+    { title: 'Blog', description: 'Read my articles', url: '/blog', type: 'page', category: tPages },
+    { title: 'Contact', description: 'Get in touch', url: '/contact', type: 'page', category: tPages },
     { title: 'Switch to Dark Mode', description: 'Change theme to dark', action: 'theme-dark', type: 'action', category: tActions },
     { title: 'Switch to Light Mode', description: 'Change theme to light', action: 'theme-light', type: 'action', category: tActions },
     { title: 'Download Resume', description: 'Get a copy of my CV', action: 'resume-download', type: 'action', category: tActions },
-    { title: 'Toggle Language', description: 'हिन्दी / English', action: 'toggle-lang', type: 'action', category: tActions },
   ];
 
   let dynamicItems: PaletteItem[] = [];

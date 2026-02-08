@@ -1,9 +1,4 @@
 ---
-import { getLangFromUrl, useTranslations, getLocalizedPath } from '../i18n/index';
-
-const lang = getLangFromUrl(Astro.url);
-const t = useTranslations(lang);
-
 const currentYear = new Date().getFullYear();
 
 const socialLinks = [
@@ -18,12 +13,12 @@ const socialLinks = [
   <div class="container footer-content">
     <div class="footer-top">
       <div class="footer-brand">
-        <a href={getLocalizedPath('/', lang)} class="footer-logo">
+        <a href="/" class="footer-logo">
           <span class="logo-bracket">&lt;</span>
           <span class="logo-name">MA</span>
           <span class="logo-bracket">/&gt;</span>
         </a>
-        <p class="footer-tagline">{t('footer.tagline')}</p>
+        <p class="footer-tagline">Building digital experiences with modern web technologies.</p>
       </div>
       <div class="footer-socials">
         {socialLinks.map((link) => (
