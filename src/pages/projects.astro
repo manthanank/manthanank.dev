@@ -216,12 +216,12 @@ try {
 
   .projects-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
     gap: 1.5rem;
   }
 
   .pinned-grid {
-    grid-template-columns: repeat(auto-fill, minmax(min(400px, 100%), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(380px, 100%), 1fr));
   }
 
   .github-cta {
@@ -244,13 +244,30 @@ try {
       padding-top: 6rem;
     }
 
+    .subsection-title {
+      font-size: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
     .projects-grid,
     .pinned-grid {
       grid-template-columns: 1fr;
+      gap: 1.25rem;
     }
 
     .github-cta {
-      padding: 2rem 1.5rem;
+      padding: 2rem 1.25rem;
+      margin-top: 3rem;
+    }
+
+    .github-cta p {
+      font-size: 0.95rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .github-cta {
+      padding: 1.5rem 1rem;
     }
   }
 </style>

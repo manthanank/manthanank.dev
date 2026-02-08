@@ -507,6 +507,20 @@ const latestPosts = [
   }
 
   @media (max-width: 768px) {
+  .projects-grid,
+  .blog-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 1024px) {
+    .hero-content {
+      gap: 2rem;
+    }
+  }
+
+  @media (max-width: 768px) {
     .hero {
       min-height: auto;
       padding-top: 100px;
@@ -545,6 +559,7 @@ const latestPosts = [
     .projects-grid,
     .blog-preview-grid {
       grid-template-columns: 1fr;
+      gap: 1.25rem;
     }
   }
 

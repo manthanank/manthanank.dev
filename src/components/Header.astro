@@ -51,21 +51,41 @@ const navLinks = [
 </header>
 
 <script>
-  const toggle = document.getElementById('mobile-toggle');
-  const navLinks = document.getElementById('nav-links');
+  function initNav() {
+    const toggle = document.getElementById('mobile-toggle');
+    const navLinks = document.getElementById('nav-links');
+    const links = navLinks?.querySelectorAll('a');
 
-  toggle?.addEventListener('click', () => {
-    navLinks?.classList.toggle('open');
-    toggle.classList.toggle('active');
-  });
-
-  // Close menu on link click
-  navLinks?.querySelectorAll('a').forEach((link) => {
-    link.addEventListener('click', () => {
-      navLinks.classList.remove('open');
-      toggle?.classList.remove('active');
+    toggle?.addEventListener('click', () => {
+      navLinks?.classList.toggle('open');
+      toggle.classList.toggle('active');
     });
-  });
+
+    // Close menu on link click
+    links?.forEach((link) => {
+      link.addEventListener('click', () => {
+        navLinks?.classList.remove('open');
+        toggle?.classList.remove('active');
+      });
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      if (navLinks?.classList.contains('open') && 
+          !navLinks.contains(target) && 
+          !toggle?.contains(target)) {
+        navLinks.classList.remove('open');
+        toggle?.classList.remove('active');
+      }
+    });
+  }
+
+  // Initial load
+  initNav();
+
+  // Re-run on view transitions
+  document.addEventListener('astro:after-swap', initNav);
 </script>
 
 <style>
