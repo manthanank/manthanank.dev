@@ -56,36 +56,44 @@ const navLinks = [
     const navLinks = document.getElementById('nav-links');
     const links = navLinks?.querySelectorAll('a');
 
-    toggle?.addEventListener('click', () => {
-      navLinks?.classList.toggle('open');
+    if (!toggle || !navLinks) return;
+
+    // Reset state
+    navLinks.classList.remove('open');
+    toggle.classList.remove('active');
+
+    // Toggle menu
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation(); // Prevent global listener from closing it immediately
+      navLinks.classList.toggle('open');
       toggle.classList.toggle('active');
     });
 
     // Close menu on link click
     links?.forEach((link) => {
       link.addEventListener('click', () => {
-        navLinks?.classList.remove('open');
-        toggle?.classList.remove('active');
-      });
-    });
-
-    // Close menu when clicking outside
-    document.addEventListener('click', (e) => {
-      const target = e.target as HTMLElement;
-      if (navLinks?.classList.contains('open') && 
-          !navLinks.contains(target) && 
-          !toggle?.contains(target)) {
         navLinks.classList.remove('open');
-        toggle?.classList.remove('active');
-      }
+        toggle.classList.remove('active');
+      });
     });
   }
 
-  // Initial load
-  initNav();
+  // Close menu when clicking outside (Global listener added once)
+  document.addEventListener('click', (e) => {
+    const toggle = document.getElementById('mobile-toggle');
+    const navLinks = document.getElementById('nav-links');
+    const target = e.target as HTMLElement;
+    
+    if (navLinks?.classList.contains('open') && 
+        !navLinks.contains(target) && 
+        !toggle?.contains(target)) {
+      navLinks.classList.remove('open');
+      toggle?.classList.remove('active');
+    }
+  });
 
-  // Re-run on view transitions
-  document.addEventListener('astro:after-swap', initNav);
+  // Handle both initial load and view transitions
+  document.addEventListener('astro:page-load', initNav);
 </script>
 
 <style>
