@@ -1,0 +1,107 @@
+---
+interface Props {
+  name: string;
+  role: string;
+  company: string;
+  content: string;
+  avatar?: string;
+}
+
+const { name, role, company, content, avatar } = Astro.props;
+---
+
+<div class="testimonial-card reveal">
+  <div class="quote-icon">
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M14.017 21L14.017 18C14.017 16.8954 14.9124 16 16.017 16H19.017C19.5693 16 20.017 15.5523 20.017 15V9C20.017 8.44772 19.5693 8 19.017 8H16.017C14.9124 8 14.017 7.10457 14.017 6V3L21.017 3V15C21.017 18.3137 18.3307 21 15.017 21H14.017ZM3.01697 21L3.01697 18C3.01697 16.8954 3.9124 16 5.01697 16H8.01697C8.56925 16 9.01697 15.5523 9.01697 15V9C9.01697 8.44772 8.56925 8 8.01697 8H5.01697C3.9124 8 3.01697 7.10457 3.01697 6V3L10.017 3V15C10.017 18.3137 7.33068 21 4.01697 21H3.01697Z"/></svg>
+  </div>
+  <p class="testimonial-content">"{content}"</p>
+  <div class="testimonial-author">
+    {avatar ? (
+      <img src={avatar} alt={name} class="author-avatar" />
+    ) : (
+      <div class="author-avatar placeholder">{name.charAt(0)}</div>
+    )}
+    <div class="author-info">
+      <h4 class="author-name">{name}</h4>
+      <p class="author-role">{role} at {company}</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .testimonial-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    transition: all var(--transition);
+  }
+
+  .testimonial-card:hover {
+    border-color: var(--color-primary);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 40px rgba(0, 212, 255, 0.1);
+  }
+
+  .quote-icon {
+    color: var(--color-primary);
+    opacity: 0.1;
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+  }
+
+  .testimonial-content {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--color-text);
+    font-style: italic;
+    margin-bottom: 2rem;
+    flex-grow: 1;
+    position: relative;
+    z-index: 2;
+  }
+
+  .testimonial-author {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border-top: 1px solid var(--color-border);
+    padding-top: 1.5rem;
+  }
+
+  .author-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--color-primary);
+  }
+
+  .author-avatar.placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+    color: white;
+    font-weight: 700;
+    font-size: 1.25rem;
+  }
+
+  .author-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .author-role {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin: 0.25rem 0 0;
+  }
+</style>
