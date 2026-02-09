@@ -4,9 +4,11 @@ import { Image } from 'astro:assets';
 import SkillBadge from '../components/SkillBadge.astro';
 import ExperienceItem from '../components/ExperienceItem.astro';
 
-const frontendSkills = ['Angular', 'React', 'TypeScript', 'JavaScript', 'HTML5', 'CSS3', 'SCSS', 'RxJS', 'NgRx', 'Astro'];
-const backendSkills = ['Node.js', 'Express.js', 'MongoDB', 'REST APIs', 'PostgreSQL', 'Firebase'];
-const toolsSkills = ['Git', 'GitHub', 'VS Code', 'Docker', 'npm', 'Webpack', 'Netlify', 'Firebase'];
+const frontendSkills = ['Angular', 'RxJS', 'TypeScript', 'JavaScript', 'HTML5', 'CSS3', 'SCSS'];
+const backendSkills = ['Node.js', 'Express.js', 'Flask', 'Python', 'FastAPI ',  'REST APIs', 'WebSockets'];
+const databaseSkills = ['MongoDB', 'MySQL', 'PostgreSQL', 'Firebase'];
+const toolsSkills = ['Git', 'GitHub', 'GitLab', 'Bitbucket', 'Docker', 'CI/CD Pipelines', 'Jira', 'Postman'];
+const cloudSkills = ['AWS', 'GCP', 'Microsoft Azure'];
 
 const GITHUB_TOKEN = import.meta.env.GITHUB_TOKEN;
 
@@ -115,25 +117,55 @@ try {
 
 const experience = [
   {
-    title: 'Full Stack Developer',
-    company: 'Freelance / Open Source',
-    period: '2022 - Present',
+    title: 'Software Developer',
+    company: 'Senwell Group Pvt Ltd',
+    period: 'Oct 2024 - Jan 2025',
     description: [
-      'Developed and maintained multiple open-source Angular projects and npm packages',
-      'Built full-stack web applications using the MEAN stack',
-      'Created educational content and learning resources for the Angular community',
-      'Contributed to open-source projects and maintained personal developer tools',
+      'Enhanced and maintained Angular-based applications for recruitment platforms and tolling & traffic management systems',
+      'Collaborated with cross-functional teams including designers, backend developers, and product managers',
+      'Worked on microservice architectures, ensuring efficient communication between services',
+      'Focused on creating efficient, user-centric applications following industry best practices',
     ],
   },
   {
-    title: 'Software Developer',
-    company: 'Previous Company',
-    period: '2020 - 2022',
+    title: 'Software Engineer',
+    company: 'BlackCoffer',
+    period: 'Feb 2023 - Aug 2024',
     description: [
-      'Built responsive web applications using Angular and TypeScript',
-      'Developed RESTful APIs with Node.js and Express',
-      'Collaborated with cross-functional teams in an Agile environment',
-      'Improved application performance and code quality through refactoring',
+      'Designed and developed an API dashboard using Angular with distinct user and admin roles',
+      'Built a multi-role hospital management system with Angular, Node.js, and MySQL, deployed on AWS',
+      'Integrated real-time notifications using WebSockets for timely updates',
+      'Refactored and optimized code, reducing build size by more than 50%',
+    ],
+  },
+  {
+    title: 'Full Stack Developer Intern',
+    company: 'AppiVa Software Pvt Ltd',
+    period: 'Jul 2022 - Dec 2022',
+    description: [
+      'Enhanced existing applications by adding new features and providing ongoing maintenance',
+      'Used Angular, Node.js, Python, and Firebase for frontend, backend, and real-time data management',
+      'Deployed solutions on AWS and ensured application performance post-deployment',
+    ],
+  },
+  {
+    title: 'Angular Developer Intern',
+    company: 'Faclon Labs Pvt Ltd',
+    period: 'Nov 2021 - Apr 2022',
+    description: [
+      'Collaborated on Angular-based projects including admin panels and user interfaces',
+      'Applied Angular best practices such as modular architecture and reusable components',
+      'Integrated backend RESTful APIs and conducted comprehensive testing',
+    ],
+  },
+  {
+    title: 'Front End Trainee',
+    company: 'SounderGrad',
+    period: 'May 2021 - Aug 2021',
+    description: [
+      'Completed training in HTML, CSS, JavaScript, jQuery, and Angular',
+      'Developed a Corona Tracker application using Angular and REST APIs',
+      'Improved skills in API integration and asynchronous data handling',
     ],
   },
 ];
@@ -277,6 +309,18 @@ const {
             {toolsSkills.map((skill) => <SkillBadge name={skill} />)}
           </div>
         </div>
+        <div class="skill-category">
+          <h3 class="category-title">Databases</h3>
+          <div class="skill-list">
+            {databaseSkills.map((skill) => <SkillBadge name={skill} />)}
+          </div>
+        </div>
+        <div class="skill-category">
+          <h3 class="category-title">Cloud Platforms</h3>
+          <div class="skill-list">
+            {cloudSkills.map((skill) => <SkillBadge name={skill} />)}
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -291,6 +335,24 @@ const {
           <div class="timeline-progress"></div>
         </div>
         {experience.map((exp) => <ExperienceItem {...exp} />)}
+      </div>
+    </div>
+  </section>
+
+  <!-- Education -->
+  <section class="section education-section">
+    <div class="container">
+      <h2 class="section-title">Education</h2>
+      <p class="section-subtitle">My academic background</p>
+      <div class="education-card">
+        <div class="education-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+        </div>
+        <div class="education-content">
+          <h3 class="education-degree">Bachelor of Engineering (B.E) in Computer Science</h3>
+          <p class="education-institution">Sahyadri College of Engineering & Management, Mangalore</p>
+          <span class="education-period">Aug 2016 - Aug 2020</span>
+        </div>
       </div>
     </div>
   </section>
@@ -711,6 +773,81 @@ const {
 
     .about-actions .btn {
       justify-content: center;
+    }
+  }
+
+  /* Education Section */
+  .education-section {
+    background: var(--color-bg-alt);
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .education-card {
+    display: flex;
+    gap: 1.5rem;
+    padding: 2rem;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    max-width: 700px;
+    margin: 0 auto;
+    transition: all var(--transition);
+  }
+
+  .education-card:hover {
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 212, 255, 0.1);
+  }
+
+  .education-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(189, 147, 249, 0.1));
+    color: var(--color-primary);
+    flex-shrink: 0;
+  }
+
+  .education-content {
+    flex: 1;
+  }
+
+  .education-degree {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 0.5rem;
+  }
+
+  .education-institution {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .education-period {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--color-primary);
+    background: rgba(0, 212, 255, 0.1);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+  }
+
+  @media (max-width: 480px) {
+    .education-card {
+      flex-direction: column;
+      text-align: center;
+      padding: 1.5rem;
+    }
+
+    .education-icon {
+      margin: 0 auto;
     }
   }
 </style>
