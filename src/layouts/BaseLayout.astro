@@ -86,7 +86,7 @@ const finalOgImage = image || `/og/${finalOgId}.png`;
     <!-- Preconnect to external APIs for performance -->
     <link rel="preconnect" href="https://api.github.com" />
     <link rel="preconnect" href="https://dev.to" />
-    <!-- <link rel="dns-prefetch" href="https://analytics.eu.umami.is" /> Disabled: Umami not configured -->
+    <link rel="dns-prefetch" href="https://eu.umami.is" />
 
     <!-- View Transitions -->
     <ViewTransitions />
@@ -117,8 +117,7 @@ const finalOgImage = image || `/og/${finalOgId}.png`;
     <title>{title}</title>
 
     <!-- Analytics (Umami - privacy-friendly, self-hosted alternative) -->
-    <!-- Disabled: Domain not resolving. Re-enable when Umami is properly configured. -->
-    <!-- <script defer src="https://analytics.eu.umami.is/script.js" data-website-id="0c25f17e-9f35-466e-ae73-341d3cd4e0ae" is:inline></script> -->
+    <script defer src="https://eu.umami.is/script.js" data-website-id="0c25f17e-9f35-466e-ae73-341d3cd4e0ae" is:inline></script>
   </head>
   <body>
     <script is:inline>
