@@ -140,6 +140,36 @@ try {
     },
   ];
 }
+
+const resumeProjects = [
+  {
+    title: 'Patient Discharge and Call Monitoring Web App',
+    description: 'Led the development and management of this project for over 10 months. Implemented real-time communication using Socket.IO and deployed on AWS for scalability.',
+    tags: ['Angular', 'Node.js', 'MySQL', 'Socket.IO', 'AWS'],
+    company: 'Blackcoffer',
+  },
+  {
+    title: 'API Admin & Client Dashboard',
+    description: 'Developed comprehensive admin and client dashboards from the ground up, integrating over 150 APIs with robust Authentication and Authorization mechanisms.',
+    tags: ['Angular', 'REST APIs', 'UI/UX', 'Dashboard'],
+    company: 'Blackcoffer',
+  },
+  {
+    title: 'Brain Tumor Detection',
+    description: 'Final year project involving image detection and classification using MRI images. Utilized Flask for the frontend and specialized in testing and training methods.',
+    tags: ['Flask', 'Python', 'Machine Learning', 'Healthcare'],
+  },
+  {
+    title: 'Complaint Management System',
+    description: 'A web development project featuring a responsive interface for registering and storing complaints in a structured database.',
+    tags: ['PHP', 'MySQL', 'Web Development'],
+  },
+  {
+    title: 'Census Management System',
+    description: 'A DBMS project designed to store and manage census data with high performance and thorough testing.',
+    tags: ['DBMS', 'SQL', 'Data Management'],
+  }
+];
 ---
 
 <BaseLayout title="Projects | Manthan Ankolekar" description="A showcase of my recent work and open source contributions.">
@@ -158,6 +188,19 @@ try {
     </h2>
     <div class="projects-grid pinned-grid">
       {pinnedProjects.map((project) => (
+        <ProjectCard {...project} />
+      ))}
+    </div>
+  </section>
+
+  <!-- Work Projects from Resume -->
+  <section class="container work-projects-section">
+    <h2 class="subsection-title">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+      Work & Resume Projects
+    </h2>
+    <div class="projects-grid">
+      {resumeProjects.map((project) => (
         <ProjectCard {...project} />
       ))}
     </div>
@@ -192,6 +235,10 @@ try {
 
   .pinned-section {
     padding-bottom: 2rem;
+  }
+
+  .work-projects-section {
+    padding-bottom: 4rem;
   }
 
   .projects-section {

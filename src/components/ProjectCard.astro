@@ -8,9 +8,10 @@ interface Props {
   image?: string;
   stars?: number;
   slug?: string;
+  company?: string;
 }
 
-const { title, description, tags, github, live, stars, slug } = Astro.props;
+const { title, description, tags, github, live, stars, slug, company } = Astro.props;
 ---
 
 <article class="project-card" data-tilt>
@@ -39,7 +40,10 @@ const { title, description, tags, github, live, stars, slug } = Astro.props;
         )}
       </div>
     </div>
-    <h3 class="card-title">{title}</h3>
+    <div class="title-wrapper">
+      <h3 class="card-title">{title}</h3>
+      {company && <span class="company-badge">{company}</span>}
+    </div>
     <p class="card-description">{description}</p>
     <div class="card-tags">
       {tags.map((tag) => (
@@ -133,14 +137,35 @@ const { title, description, tags, github, live, stars, slug } = Astro.props;
     color: var(--color-primary);
   }
 
+  .title-wrapper {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+    position: relative;
+    z-index: 2;
+  }
+
   .card-title {
     font-size: 1.15rem;
     font-weight: 600;
-    margin-bottom: 0.75rem;
     color: var(--color-text);
-    position: relative;
-    z-index: 2;
     pointer-events: none;
+    line-height: 1.4;
+  }
+
+  .company-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-text-muted);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
+    white-space: nowrap;
   }
 
   .card-description {
