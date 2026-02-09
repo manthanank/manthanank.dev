@@ -180,6 +180,12 @@ const experience = [
   },
 ];
 
+const profileLanguages = [
+  { name: 'English', level: 'Professional Working Proficiency' },
+  { name: 'Hindi', level: 'Native or Bilingual Proficiency' },
+  { name: 'Kannada', level: 'Native or Bilingual Proficiency' },
+];
+
 const {
   repos = 0,
   stars = 0,
@@ -363,6 +369,22 @@ const {
           <p class="education-institution">Sahyadri College of Engineering & Management, Mangalore</p>
           <span class="education-period">Aug 2016 - Aug 2020</span>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Languages -->
+  <section class="section languages-section">
+    <div class="container">
+      <h2 class="section-title">Languages</h2>
+      <p class="section-subtitle">Languages I speak fluently</p>
+      <div class="languages-grid">
+        {profileLanguages.map((lang) => (
+          <div class="language-card">
+            <span class="language-name">{lang.name}</span>
+            <span class="language-level">{lang.level}</span>
+          </div>
+        ))}
       </div>
     </div>
   </section>
@@ -859,5 +881,49 @@ const {
     .education-icon {
       margin: 0 auto;
     }
+  }
+
+  /* Languages Section */
+  .languages-section {
+    padding-bottom: 5rem;
+  }
+
+  .languages-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .language-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: all var(--transition);
+  }
+
+  .language-card:hover {
+    border-color: var(--color-primary);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 212, 255, 0.1);
+  }
+
+  .language-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 0.5rem;
+  }
+
+  .language-level {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
   }
 </style>
