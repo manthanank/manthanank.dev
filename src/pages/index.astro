@@ -153,7 +153,7 @@ const latestPosts = [
       <div class="hero-text animate-fade-in">
         <p class="hero-greeting">Hi, my name is</p>
         <h1 class="hero-name">Manthan Ankolekar</h1>
-        <h2 class="hero-headline">I build things for the web.</h2>
+        <h2 class="hero-headline">I <span id="typewriter">build things for the web.</span><span class="cursor" aria-hidden="true">|</span></h2>
         <p class="hero-description">
           I'm a <strong>Full Stack Developer</strong> specializing in building exceptional digital experiences. Currently, I'm focused on creating performant, user-centric applications with <strong>Angular</strong> and <strong>Node.js</strong>.
         </p>
@@ -237,11 +237,68 @@ const latestPosts = [
       });
     }
 
-    // Run on load
-    initTypingAnimation();
+    function initHeadlineTyping() {
+      const element = document.getElementById('typewriter');
+      if (!element) return;
 
-    // Run after view transitions
-    document.addEventListener('astro:after-swap', initTypingAnimation);
+      const phrases = [
+        "build things for the web.",
+        "create scalable systems.",
+        "design modern UIs.",
+        "develop full-stack apps.",
+        "solve complex problems."
+      ];
+      
+      let phraseIndex = 0;
+      let charIndex = phrases[0].length;
+      let isDeleting = true;
+      let timeoutId: any = null;
+
+      function type() {
+        const currentPhrase = phrases[phraseIndex];
+        let typingSpeed = isDeleting ? 50 : 100;
+
+        if (isDeleting) {
+          charIndex--;
+        } else {
+          charIndex++;
+        }
+
+        element.textContent = currentPhrase.substring(0, charIndex);
+
+        if (!isDeleting && charIndex === currentPhrase.length) {
+          isDeleting = true;
+          typingSpeed = 2000; // Pause at end
+        } else if (isDeleting && charIndex === 0) {
+          isDeleting = false;
+          phraseIndex = (phraseIndex + 1) % phrases.length;
+          typingSpeed = 500; // Pause before next
+        }
+
+        timeoutId = setTimeout(type, typingSpeed);
+      }
+
+      // Initial start
+      timeoutId = setTimeout(type, 1000);
+    }
+
+    function initAnimations() {
+      // Use requestAnimationFrame for the first call to ensure the browser is ready
+      requestAnimationFrame(() => {
+        initTypingAnimation();
+        initHeadlineTyping();
+      });
+    }
+
+    // Run on load
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initAnimations);
+    } else {
+      initAnimations();
+    }
+
+    // Run after view transitions (Astro specific)
+    document.addEventListener('astro:after-swap', initAnimations);
   </script>
   <!-- Skills Section -->
   <section class="section skills-section">
@@ -353,6 +410,18 @@ const latestPosts = [
     font-weight: 700;
     color: var(--color-text-muted);
     margin-bottom: 1.25rem;
+    min-height: 1.2em; /* Prevent layout shift */
+  }
+
+  .cursor {
+    color: var(--color-primary);
+    animation: blink 1s step-end infinite;
+    margin-left: 2px;
+  }
+
+  @keyframes blink {
+    from, to { opacity: 1; }
+    50% { opacity: 0; }
   }
 
   .hero-description {
