@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import { getCollection } from 'astro:content';
+import { db, PageViews, PageLikes } from 'astro:db';
 
 const localProjects = await getCollection('projects');
 const projectSlugsMap = new Map(localProjects.map(p => [p.id, p.id]));
@@ -171,7 +172,6 @@ const resumeProjects = [
   }
 ];
 
-import { db, PageViews, PageLikes } from 'astro:db';
 
 const allViews = await db.select().from(PageViews);
 const allLikes = await db.select().from(PageLikes);

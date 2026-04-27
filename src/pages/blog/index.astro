@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import BlogCard from '../../components/BlogCard.astro';
 import { getCollection } from 'astro:content';
+import { db, PageViews, PageLikes } from 'astro:db';
 
 const DEVTO_USERNAME = 'manthanank';
 
@@ -48,8 +49,6 @@ const posts = [
   })),
   ...devtoPosts
 ].sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
-
-import { db, PageViews, PageLikes } from 'astro:db';
 
 const allViews = await db.select().from(PageViews);
 const allLikes = await db.select().from(PageLikes);
