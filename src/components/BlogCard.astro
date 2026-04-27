@@ -51,7 +51,7 @@ const isExternal = url.startsWith('http');
 
   .blog-meta {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 1rem;
     margin-bottom: 1rem;
@@ -79,6 +79,9 @@ const isExternal = url.startsWith('http');
   .blog-tags {
     display: flex;
     gap: 0.4rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    max-width: 100%;
   }
 
   .blog-tag {
@@ -90,6 +93,8 @@ const isExternal = url.startsWith('http');
     background: rgba(124, 58, 237, 0.1);
     padding: 0.15rem 0.5rem;
     border-radius: 4px;
+    max-width: 100%;
+    word-break: break-word;
   }
 
   .blog-title {
