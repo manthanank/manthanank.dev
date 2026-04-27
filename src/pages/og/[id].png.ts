@@ -34,8 +34,14 @@ export const GET: APIRoute = async ({ props }) => {
   
   try {
     // Read font
-    const fontPath = path.join(projectRoot, 'src/assets/fonts/Inter-Bold.ttf');
-    const fontData = await fs.readFile(fontPath);
+    // Satori requires a real TTF/OTF (WOFF/WOFF2 won't work). Use a bundled
+    // Inter static TTFs so opentype parsing is reliable in Node.
+    const interRegularPath = path.join(projectRoot, 'src/assets/fonts/Inter-Regular.ttf');
+    const interBoldPath = path.join(projectRoot, 'src/assets/fonts/Inter-Bold.ttf');
+    const [interRegularData, interBoldData] = await Promise.all([
+      fs.readFile(interRegularPath),
+      fs.readFile(interBoldPath),
+    ]);
 
     // Read profile image
     const profileImgPath = path.join(projectRoot, 'public/profile.jpg');
@@ -80,7 +86,6 @@ export const GET: APIRoute = async ({ props }) => {
                 style: {
                   display: 'flex',
                   flexDirection: 'column',
-                  zIndex: 10,
                 },
                 children: [
                   {
@@ -156,7 +161,6 @@ export const GET: APIRoute = async ({ props }) => {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '24px',
-                  zIndex: 10,
                 },
                 children: [
                   {
@@ -215,7 +219,13 @@ export const GET: APIRoute = async ({ props }) => {
         fonts: [
           {
             name: 'Inter',
-            data: fontData,
+            data: interRegularData,
+            weight: 400,
+            style: 'normal',
+          },
+          {
+            name: 'Inter',
+            data: interBoldData,
             weight: 700,
             style: 'normal',
           },

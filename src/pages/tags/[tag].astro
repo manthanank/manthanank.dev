@@ -13,13 +13,15 @@ export async function getStaticPaths() {
   projects.forEach((p) => (p.data.tags || []).forEach((t) => tags.add(t)));
 
   return Array.from(tags.values()).map((tag) => ({
-    params: { tag: encodeURIComponent(tag) },
-    props: { tag: encodeURIComponent(tag) },
+    // Astro handles URL encoding for params; providing encoded values can cause
+    // mismatches for tags containing spaces/special characters at build time.
+    params: { tag },
+    props: { tag },
   }));
 }
 
 const { tag } = Astro.props as { tag: string };
-const decodedTag = decodeURIComponent(tag);
+const decodedTag = tag;
 
 const blog = await getCollection('blog', ({ data }) => !data.draft && (data.tags || []).includes(decodedTag));
 const projects = await getCollection('projects', (p) => (p.data.tags || []).includes(decodedTag));

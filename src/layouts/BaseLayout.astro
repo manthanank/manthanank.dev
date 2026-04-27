@@ -1,5 +1,5 @@
 ---
-import { ViewTransitions } from 'astro:transitions';
+import { ClientRouter } from 'astro:transitions';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import SkipLink from '../components/SkipLink.astro';
@@ -89,7 +89,7 @@ const finalOgImage = image || `/og/${finalOgId}.png`;
     <link rel="dns-prefetch" href="https://eu.umami.is" />
 
     <!-- View Transitions -->
-    <ViewTransitions />
+    <ClientRouter />
 
     <script type="application/ld+json" is:inline set:html={JSON.stringify({
       "@context": "https://schema.org",
