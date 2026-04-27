@@ -84,7 +84,7 @@
   const resultsList = document.getElementById('palette-results');
   const trigger = document.getElementById('palette-trigger');
 
-  const fuseOptions: Fuse.IFuseOptions<PaletteItem> = {
+  const fuseOptions: any = {
     keys: [
       { name: 'title', weight: 0.4 },
       { name: 'description', weight: 0.3 },
@@ -231,7 +231,7 @@
         link.click();
         break;
       case 'toggle-lang':
-        const currentLang = localStorage.getItem('preferred-lang') || lang || 'en';
+        const currentLang = localStorage.getItem('preferred-lang') || 'en';
         const newLang = currentLang === 'en' ? 'hi' : 'en';
         localStorage.setItem('preferred-lang', newLang);
         

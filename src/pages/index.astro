@@ -138,12 +138,21 @@ try {
 const latestPosts = [
   ...localPosts.map(post => ({
     data: post.data,
-    url: `/blog/${post.id}`
+    url: `/blog/${post.id}`,
+    slug: post.id
   })),
   ...devtoPosts
 ]
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
   .slice(0, 3);
+
+import { db, PageViews, PageLikes } from 'astro:db';
+
+const allViews = await db.select().from(PageViews);
+const allLikes = await db.select().from(PageLikes);
+
+const viewsMap = new Map(allViews.map(v => [v.slug, v.views]));
+const likesMap = new Map(allLikes.map(l => [l.slug, l.likes]));
 ---
 
 <BaseLayout title="Manthan Ankolekar | Full Stack Developer">
@@ -203,7 +212,7 @@ const latestPosts = [
       function type() {
         if (i < parts.length) {
           const part = parts[i];
-          codeElement.innerHTML += part;
+          if (codeElement) codeElement.innerHTML += part;
           i++;
           
           // If it's a tag, type next immediately, otherwise wait
@@ -216,7 +225,7 @@ const latestPosts = [
       }
 
       // Start typing after a delay
-      codeElement.innerHTML = "";
+      if (codeElement) codeElement.innerHTML = "";
       setTimeout(type, 1000);
 
       // Click listener for code interactive elements
@@ -252,7 +261,6 @@ const latestPosts = [
       let phraseIndex = 0;
       let charIndex = phrases[0].length;
       let isDeleting = true;
-      let timeoutId: any = null;
 
       function type() {
         const currentPhrase = phrases[phraseIndex];
@@ -264,7 +272,7 @@ const latestPosts = [
           charIndex++;
         }
 
-        element.textContent = currentPhrase.substring(0, charIndex);
+        if (element) element.textContent = currentPhrase.substring(0, charIndex);
 
         if (!isDeleting && charIndex === currentPhrase.length) {
           isDeleting = true;
@@ -275,11 +283,11 @@ const latestPosts = [
           typingSpeed = 500; // Pause before next
         }
 
-        timeoutId = setTimeout(type, typingSpeed);
+        setTimeout(type, typingSpeed);
       }
 
       // Initial start
-      timeoutId = setTimeout(type, 1000);
+      setTimeout(type, 1000);
     }
 
     function initAnimations() {
@@ -323,7 +331,11 @@ const latestPosts = [
       <div class="projects-grid">
         {featuredProjects.map((project, index) => (
           <div class={`reveal reveal-delay-${(index % 3) + 1}`}>
-            <ProjectCard {...project} />
+            <ProjectCard 
+              {...project} 
+              views={project.slug ? viewsMap.get(project.slug) : undefined} 
+              likes={project.slug ? likesMap.get(project.slug) : undefined} 
+            />
           </div>
         ))}
       </div>
@@ -348,6 +360,8 @@ const latestPosts = [
                 date={post.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                 tags={post.data.tags}
                 url={post.url}
+                views={post.slug ? viewsMap.get(post.slug) : undefined}
+                likes={post.slug ? likesMap.get(post.slug) : undefined}
               />
             </div>
           ))}

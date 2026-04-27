@@ -9,9 +9,11 @@ interface Props {
   stars?: number;
   slug?: string;
   company?: string;
+  views?: number;
+  likes?: number;
 }
 
-const { title, description, tags, github, live, stars, slug, company } = Astro.props;
+const { title, description, tags, github, live, stars, slug, company, views, likes } = Astro.props;
 ---
 
 <article class="project-card" data-tilt>
@@ -20,12 +22,26 @@ const { title, description, tags, github, live, stars, slug, company } = Astro.p
     <div class="card-header">
       <div class="header-left">
         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="folder-icon"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
-        {stars !== undefined && stars > 0 && (
-          <div class="stars-badge">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <span>{stars}</span>
-          </div>
-        )}
+        <div class="metrics-badges">
+          {stars !== undefined && stars > 0 && (
+            <div class="badge stars-badge" title="GitHub Stars">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <span>{stars}</span>
+            </div>
+          )}
+          {views !== undefined && (
+            <div class="badge views-badge" title="Views">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+              <span>{views}</span>
+            </div>
+          )}
+          {likes !== undefined && (
+            <div class="badge likes-badge" title="Likes">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+              <span>{likes}</span>
+            </div>
+          )}
+        </div>
       </div>
       <div class="card-links">
         {github && (
@@ -103,7 +119,14 @@ const { title, description, tags, github, live, stars, slug, company } = Astro.p
     color: var(--color-primary);
   }
 
-  .stars-badge {
+  .metrics-badges {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .badge {
     display: flex;
     align-items: center;
     gap: 0.25rem;
@@ -116,9 +139,9 @@ const { title, description, tags, github, live, stars, slug, company } = Astro.p
     border: 1px solid var(--color-border);
   }
 
-  .stars-badge svg {
-    color: #f1c40f;
-  }
+  .stars-badge svg { color: #f1c40f; }
+  .likes-badge svg { color: var(--color-primary); }
+  .views-badge svg { color: var(--color-text-muted); }
 
   .card-links {
     display: flex;

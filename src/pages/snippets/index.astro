@@ -1,0 +1,115 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const snippets = await getCollection('snippets');
+const sortedSnippets = snippets.sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+---
+
+<BaseLayout title="Snippets | Manthan Ankolekar" description="Bite-sized code snippets and today I learned (TIL) moments.">
+  <section class="section snippets-hero">
+    <div class="container">
+      <h1 class="section-title">Snippets</h1>
+      <p class="section-subtitle">Bite-sized code snippets and today I learned (TIL) moments.</p>
+    </div>
+  </section>
+
+  <section class="container snippets-content">
+    <div class="snippets-grid">
+      {sortedSnippets.map(snippet => (
+        <a href={`/snippets/${snippet.id}`} class="snippet-card">
+          <div class="snippet-date">{snippet.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+          <h2 class="snippet-title">{snippet.data.title}</h2>
+          <p class="snippet-description">{snippet.data.description}</p>
+          <div class="snippet-tags">
+            {snippet.data.tags.map(tag => (
+              <span class="snippet-tag">{tag}</span>
+            ))}
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .snippets-hero {
+    padding-top: 8rem;
+    padding-bottom: 2rem;
+  }
+
+  .snippets-content {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding-bottom: 4rem;
+  }
+
+  .snippets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+
+  .snippet-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    transition: all var(--transition);
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .snippet-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--color-accent);
+    box-shadow: 0 10px 40px rgba(124, 58, 237, 0.1);
+  }
+
+  .snippet-date {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin-bottom: 0.5rem;
+  }
+
+  .snippet-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 0.5rem;
+  }
+  
+  .snippet-card:hover .snippet-title {
+    color: var(--color-primary);
+  }
+
+  .snippet-description {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    flex-grow: 1;
+  }
+
+  .snippet-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .snippet-tag {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--color-accent-light);
+    background: rgba(124, 58, 237, 0.1);
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+  }
+</style>

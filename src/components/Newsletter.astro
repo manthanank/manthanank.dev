@@ -1,0 +1,162 @@
+---
+---
+
+<div class="newsletter-card">
+  <div class="newsletter-content">
+    <h3>Subscribe to the newsletter</h3>
+    <p>Get notified when I publish new articles. No spam, unsubscribe at any time.</p>
+    
+    <form class="newsletter-form" id="newsletter-form">
+      <input 
+        type="email" 
+        id="email-input"
+        placeholder="you@example.com" 
+        required 
+        aria-label="Email address"
+      />
+      <button type="submit" class="btn btn-primary" id="subscribe-btn">
+        Subscribe
+      </button>
+    </form>
+    <div id="newsletter-message" class="newsletter-message" style="display: none;"></div>
+  </div>
+</div>
+
+<style>
+  .newsletter-card {
+    background: linear-gradient(145deg, var(--color-bg-alt), var(--color-bg-card));
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 2.5rem;
+    margin: 3rem 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .newsletter-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(to right, var(--color-gradient-start), var(--color-gradient-end));
+  }
+
+  .newsletter-content {
+    max-width: 500px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .newsletter-card h3 {
+    font-size: 1.5rem;
+    color: var(--color-text);
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+  }
+
+  .newsletter-card p {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .newsletter-form {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .newsletter-form input {
+    flex-grow: 1;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--color-border);
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color var(--transition);
+  }
+
+  .newsletter-form input:focus {
+    border-color: var(--color-primary);
+  }
+
+  .newsletter-message {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    padding: 0.75rem;
+    border-radius: 4px;
+  }
+
+  .newsletter-message.success {
+    background: rgba(166, 227, 161, 0.1);
+    color: #a6e3a1;
+    border: 1px solid rgba(166, 227, 161, 0.2);
+  }
+
+  .newsletter-message.error {
+    background: rgba(243, 139, 168, 0.1);
+    color: #f38ba8;
+    border: 1px solid rgba(243, 139, 168, 0.2);
+  }
+
+  @media (max-width: 480px) {
+    .newsletter-form {
+      flex-direction: column;
+    }
+  }
+</style>
+
+<script>
+  function initNewsletter() {
+    const form = document.getElementById('newsletter-form');
+    const input = document.getElementById('email-input') as HTMLInputElement;
+    const btn = document.getElementById('subscribe-btn');
+    const msg = document.getElementById('newsletter-message');
+
+    if (!form || !input || !btn || !msg) return;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = input.value;
+      if (!email) return;
+
+      btn.innerHTML = 'Subscribing...';
+      btn.setAttribute('disabled', 'true');
+      
+      try {
+        const res = await fetch('/api/newsletter', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        
+        if (res.ok) {
+          msg.textContent = "Thanks for subscribing! Check your inbox to confirm.";
+          msg.className = 'newsletter-message success';
+          input.value = '';
+        } else {
+          msg.textContent = "Oops! Something went wrong. Please try again.";
+          msg.className = 'newsletter-message error';
+        }
+      } catch (err) {
+        msg.textContent = "Oops! Something went wrong. Please try again.";
+        msg.className = 'newsletter-message error';
+      }
+
+      msg.style.display = 'block';
+      btn.innerHTML = 'Subscribe';
+      btn.removeAttribute('disabled');
+      
+      setTimeout(() => {
+        msg.style.display = 'none';
+      }, 5000);
+    });
+  }
+
+  initNewsletter();
+  document.addEventListener('astro:after-swap', initNewsletter);
+</script>

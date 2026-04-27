@@ -28,4 +28,14 @@ const projects = defineCollection({
   }),
 });
 
-export const collections = { blog, projects };
+const snippets = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/snippets' }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    pubDate: z.coerce.date(),
+    tags: z.array(z.string()).default([]),
+  }),
+});
+
+export const collections = { blog, projects, snippets };

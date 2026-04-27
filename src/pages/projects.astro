@@ -170,6 +170,14 @@ const resumeProjects = [
     tags: ['DBMS', 'SQL', 'Data Management'],
   }
 ];
+
+import { db, PageViews, PageLikes } from 'astro:db';
+
+const allViews = await db.select().from(PageViews);
+const allLikes = await db.select().from(PageLikes);
+
+const viewsMap = new Map(allViews.map(v => [v.slug, v.views]));
+const likesMap = new Map(allLikes.map(l => [l.slug, l.likes]));
 ---
 
 <BaseLayout title="Projects | Manthan Ankolekar" description="A showcase of my recent work and open source contributions.">
@@ -188,7 +196,11 @@ const resumeProjects = [
     </h2>
     <div class="projects-grid pinned-grid">
       {pinnedProjects.map((project) => (
-        <ProjectCard {...project} />
+        <ProjectCard 
+          {...project} 
+          views={project.slug ? viewsMap.get(project.slug) : undefined}
+          likes={project.slug ? likesMap.get(project.slug) : undefined}
+        />
       ))}
     </div>
   </section>
@@ -201,7 +213,11 @@ const resumeProjects = [
     </h2>
     <div class="projects-grid">
       {resumeProjects.map((project) => (
-        <ProjectCard {...project} />
+        <ProjectCard 
+          {...project} 
+          views={project.slug ? viewsMap.get(project.slug) : undefined}
+          likes={project.slug ? likesMap.get(project.slug) : undefined}
+        />
       ))}
     </div>
   </section>
@@ -213,7 +229,11 @@ const resumeProjects = [
     </h2>
     <div class="projects-grid">
       {otherProjects.map((project) => (
-        <ProjectCard {...project} />
+        <ProjectCard 
+          {...project} 
+          views={project.slug ? viewsMap.get(project.slug) : undefined}
+          likes={project.slug ? likesMap.get(project.slug) : undefined}
+        />
       ))}
     </div>
 

@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import BlogCard from '../../components/BlogCard.astro';
 import TableOfContents from '../../components/TableOfContents.astro';
+import Newsletter from '../../components/Newsletter.astro';
 import { getCollection, render } from 'astro:content';
 
 export async function getStaticPaths() {
@@ -62,6 +63,11 @@ const relatedPosts = allPosts
           <time>{formattedDate}</time>
           <span class="meta-divider">•</span>
           <span class="reading-time">{readingTime} min read</span>
+          <span class="meta-divider">•</span>
+          <span class="view-counter" id={`view-counter-${post.id}`}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            <span class="view-count-text skeleton">...</span>
+          </span>
           {post.data.draft && <span class="draft-badge">Draft Preview</span>}
           {(post.data.series || (post.data.tags?.length ?? 0) > 0) && (
             <div class="post-taxonomy">
@@ -86,6 +92,15 @@ const relatedPosts = allPosts
         </div>
         <TableOfContents headings={headings} />
       </div>
+
+      <div class="reaction-container">
+        <button id={`like-btn-${post.id}`} class="like-btn" aria-label="Like this post">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="heart-icon"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+          <span class="like-count">0</span>
+        </button>
+      </div>
+
+      <Newsletter />
 
       <footer class="post-footer">
         <div class="footer-actions">
@@ -214,13 +229,128 @@ const relatedPosts = allPosts
     });
   }
 
+  function initInteractions() {
+    // 1. Setup real views
+    const viewCounters = document.querySelectorAll('.view-counter');
+    viewCounters.forEach(async (counter) => {
+      const id = counter.id.replace('view-counter-', '');
+      const textEl = counter.querySelector('.view-count-text');
+      if (!textEl) return;
+      
+      try {
+        const storageKey = `viewed_${id}`;
+        const hasViewed = sessionStorage.getItem(storageKey);
+        
+        let method = 'POST';
+        if (hasViewed) {
+          method = 'GET';
+        }
+
+        const res = await fetch(`/api/views/${id}`, { method });
+        const data = await res.json();
+        
+        if (!hasViewed) {
+          sessionStorage.setItem(storageKey, 'true');
+        }
+        
+        textEl.textContent = `${data.views || data.count || 0} views`;
+        textEl.classList.remove('skeleton');
+      } catch (e) {
+        textEl.textContent = '0 views';
+        textEl.classList.remove('skeleton');
+      }
+    });
+
+    // 2. Setup likes
+    const likeBtns = document.querySelectorAll('.like-btn');
+    likeBtns.forEach(async (btn) => {
+      const id = btn.id.replace('like-btn-', '');
+      const countEl = btn.querySelector('.like-count');
+      const icon = btn.querySelector('.heart-icon');
+      if (!countEl || !icon) return;
+
+      const storageKey = `liked_${id}`;
+      let isLiked = localStorage.getItem(storageKey) === 'true';
+      
+      // Initial fetch
+      try {
+        const res = await fetch(`/api/likes/${id}`);
+        const data = await res.json();
+        countEl.textContent = data.likes.toString();
+      } catch (e) {
+        countEl.textContent = '0';
+      }
+
+      if (isLiked) {
+        btn.classList.add('liked');
+        icon.setAttribute('fill', 'var(--color-primary)');
+        icon.setAttribute('stroke', 'var(--color-primary)');
+      }
+
+      // We need to keep track if a request is in progress to avoid spam
+      let isLiking = false;
+
+      btn.addEventListener('click', async () => {
+        if (isLiking) return;
+        isLiking = true;
+        
+        isLiked = !isLiked;
+        localStorage.setItem(storageKey, isLiked.toString());
+        
+        // Optimistic UI update
+        let currentLikes = parseInt(countEl.textContent || '0');
+        
+        if (isLiked) {
+          countEl.textContent = (currentLikes + 1).toString();
+          btn.classList.add('liked');
+          icon.setAttribute('fill', 'var(--color-primary)');
+          icon.setAttribute('stroke', 'var(--color-primary)');
+          (btn as HTMLElement).style.transform = 'scale(1.2)';
+          setTimeout(() => (btn as HTMLElement).style.transform = 'scale(1)', 150);
+        } else {
+          countEl.textContent = Math.max(0, currentLikes - 1).toString();
+          btn.classList.remove('liked');
+          icon.setAttribute('fill', 'none');
+          icon.setAttribute('stroke', 'currentColor');
+        }
+
+        // Send to server
+        try {
+          const res = await fetch(`/api/likes/${id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: isLiked ? 'like' : 'unlike' })
+          });
+          const data = await res.json();
+          // Update with real truth from server just in case
+          countEl.textContent = data.likes.toString();
+        } catch (e) {
+          // Revert on failure
+          isLiked = !isLiked;
+          localStorage.setItem(storageKey, isLiked.toString());
+          if (isLiked) {
+            btn.classList.add('liked');
+            icon.setAttribute('fill', 'var(--color-primary)');
+          } else {
+            btn.classList.remove('liked');
+            icon.setAttribute('fill', 'none');
+          }
+        } finally {
+          isLiking = false;
+        }
+      });
+    });
+  }
+
   initReadingProgress();
   initHeadingAnchors();
   initShare();
+  initInteractions();
   document.addEventListener('astro:after-swap', () => {
     initReadingProgress();
     initHeadingAnchors();
     initShare();
+    initInteractions();
   });
 </script>
 
@@ -289,6 +419,22 @@ const relatedPosts = allPosts
     font-family: var(--font-mono);
     font-size: 0.85rem;
     color: var(--color-text-muted);
+  }
+
+  .view-counter {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+    font-family: var(--font-mono);
+  }
+
+  .view-count-text.skeleton {
+    color: transparent;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    animation: pulse 1.5s infinite;
   }
 
   .meta-divider {
@@ -490,6 +636,44 @@ const relatedPosts = allPosts
     border: none;
     border-top: 1px solid var(--color-border);
     margin: 2rem 0;
+  }
+
+  .reaction-container {
+    display: flex;
+    justify-content: center;
+    margin: 4rem 0 2rem;
+  }
+
+  .like-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--color-bg-alt);
+    border: 1px solid var(--color-border);
+    padding: 0.75rem 1.5rem;
+    border-radius: 999px;
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .like-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 212, 255, 0.1);
+  }
+
+  .like-btn.liked {
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+
+  .like-btn svg {
+    transition: all 0.2s ease;
   }
 
   .post-footer {

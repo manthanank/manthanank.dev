@@ -1,48 +1,131 @@
 ---
+export const prerender = false;
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { db, Guestbook as GuestbookTable, desc } from 'astro:db';
+
+let error = '';
+let success = false;
+
+if (Astro.request.method === 'POST') {
+  try {
+    const data = await Astro.request.formData();
+    const name = data.get('name')?.toString();
+    const email = data.get('email')?.toString() || null;
+    const message = data.get('message')?.toString();
+    const botField = data.get('bot-field')?.toString();
+
+    // Honeypot check
+    if (botField) {
+      throw new Error('Bot detected');
+    }
+
+    if (!name || !message) {
+      error = 'Name and message are required.';
+    } else {
+      const id = crypto.randomUUID();
+      await db.insert(GuestbookTable).values({
+        id,
+        name,
+        email,
+        message,
+        createdAt: new Date(),
+      });
+      
+      try {
+        const resendApiKey = import.meta.env.RESEND_API_KEY;
+        if (resendApiKey) {
+          const { Resend } = await import('resend');
+          const resend = new Resend(resendApiKey);
+          await resend.emails.send({
+            from: 'Guestbook <hello@manthanank.dev>',
+            to: 'manthan.ank46@gmail.com', // To admin
+            subject: `New Guestbook Entry from ${name}`,
+            text: `Name: ${name}\nEmail: ${email || 'N/A'}\nMessage: ${message}`,
+          });
+        }
+      } catch (emailErr) {
+        console.warn('Failed to send notification email', emailErr);
+      }
+      
+      success = true;
+    }
+  } catch (e) {
+    console.error(e);
+    error = 'Something went wrong. Please try again.';
+  }
+}
+
+// Fetch all entries
+const entries = await db.select().from(GuestbookTable).orderBy(desc(GuestbookTable.createdAt));
 ---
 
 <BaseLayout title="Guestbook | Manthan Ankolekar" description="Leave a note — I read every message.">
   <section class="section guestbook-hero">
     <div class="container">
       <h1 class="section-title">Guestbook</h1>
-      <p class="section-subtitle">Drop a quick hello, feedback, or a question.</p>
+      <p class="section-subtitle">Drop a quick hello, feedback, or a question. It will instantly appear below!</p>
     </div>
   </section>
 
   <section class="container guestbook-section">
-    <div class="card">
-      <form class="form" name="guestbook" method="POST" data-netlify="true" data-netlify-honeypot="bot-field">
-        <input type="hidden" name="form-name" value="guestbook" />
-        <p class="hidden" style="display:none">
-          <label>Don’t fill this out if you’re human: <input name="bot-field" /></label>
-        </p>
-
-        <div class="grid">
-          <div class="field">
-            <label for="name">Name</label>
-            <input id="name" name="name" type="text" required placeholder="Your name" />
-          </div>
-          <div class="field">
-            <label for="email">Email (optional)</label>
-            <input id="email" name="email" type="email" placeholder="you@email.com" />
-          </div>
+    <div class="card form-card">
+      {success ? (
+        <div class="success-message">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="success-icon"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <h3>Thanks for signing the guestbook!</h3>
+          <p>Your message has been added.</p>
+          <a href="/guestbook" class="btn btn-primary">Write another</a>
         </div>
+      ) : (
+        <form class="form" method="POST">
+          <!-- Honeypot field -->
+          <p class="hidden" style="display:none">
+            <label>Don’t fill this out if you’re human: <input name="bot-field" /></label>
+          </p>
 
-        <div class="field">
-          <label for="message">Message</label>
-          <textarea id="message" name="message" rows="5" required placeholder="Write your note..."></textarea>
+          {error && <div class="error-banner">{error}</div>}
+
+          <div class="grid">
+            <div class="field">
+              <label for="name">Name</label>
+              <input id="name" name="name" type="text" required placeholder="Your name" />
+            </div>
+            <div class="field">
+              <label for="email">Email (optional - won't be public)</label>
+              <input id="email" name="email" type="email" placeholder="you@email.com" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" rows="4" required placeholder="Write your note..."></textarea>
+          </div>
+
+          <button class="btn btn-primary btn-magnetic" type="submit">
+            Sign guestbook
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+          </button>
+        </form>
+      )}
+    </div>
+
+    <div class="guestbook-entries">
+      <h2 class="entries-title">Recent Notes ({entries.length})</h2>
+      {entries.length === 0 ? (
+        <p class="empty-state">No notes yet. Be the first to sign!</p>
+      ) : (
+        <div class="entries-grid">
+          {entries.map(entry => (
+            <div class="entry-card reveal">
+              <div class="entry-header">
+                <strong>{entry.name}</strong>
+                <time>{new Date(entry.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</time>
+              </div>
+              <p class="entry-message">{entry.message}</p>
+            </div>
+          ))}
         </div>
-
-        <button class="btn btn-primary btn-magnetic" type="submit">
-          Sign guestbook
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
-        </button>
-
-        <p class="note">
-          If you’d like a guaranteed reply, use the <a href="/contact">contact form</a>.
-        </p>
-      </form>
+      )}
     </div>
   </section>
 </BaseLayout>
@@ -63,6 +146,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     border: 1px solid var(--color-border);
     border-radius: var(--radius);
     padding: 2rem;
+  }
+
+  .form-card {
+    margin-bottom: 4rem;
   }
 
   .form {
@@ -100,6 +187,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     font-size: 0.95rem;
     transition: border-color var(--transition);
     outline: none;
+    resize: vertical;
   }
 
   .field input:focus,
@@ -108,17 +196,103 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
   }
 
-  .note {
-    margin-top: 0.5rem;
-    color: var(--color-text-muted);
-    font-size: 0.85rem;
-    text-align: center;
+  .error-banner {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
   }
 
-  .note a {
-    color: var(--color-primary);
-    text-decoration: underline;
-    text-underline-offset: 3px;
+  .success-message {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--color-text);
+  }
+
+  .success-icon {
+    color: #22c55e;
+    margin-bottom: 1rem;
+  }
+
+  .success-message h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .success-message p {
+    color: var(--color-text-muted);
+    margin-bottom: 2rem;
+  }
+
+  /* Entries Styles */
+  .guestbook-entries {
+    margin-top: 2rem;
+  }
+
+  .entries-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    color: var(--color-text);
+  }
+
+  .empty-state {
+    color: var(--color-text-muted);
+    font-style: italic;
+    text-align: center;
+    padding: 3rem;
+    background: var(--color-bg-alt);
+    border-radius: 12px;
+    border: 1px dashed var(--color-border);
+  }
+
+  .entries-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .entry-card {
+    background: var(--color-bg-alt);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: transform var(--transition);
+  }
+
+  .entry-card:hover {
+    transform: translateX(5px);
+    border-color: rgba(0, 212, 255, 0.2);
+  }
+
+  .entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .entry-header strong {
+    font-size: 1.1rem;
+    color: var(--color-text);
+    background: linear-gradient(135deg, var(--color-gradient-start), var(--color-gradient-end));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .entry-header time {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+  }
+
+  .entry-message {
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    white-space: pre-wrap;
   }
 
   @media (max-width: 768px) {
@@ -130,6 +304,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     }
     .grid {
       grid-template-columns: 1fr;
+    }
+    .entry-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
     }
   }
 </style>

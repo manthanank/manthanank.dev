@@ -42,11 +42,20 @@ const posts = [
   ...localPosts.map(post => ({
     data: post.data,
     url: `/blog/${post.id}`,
+    slug: post.id,
     isExternal: false,
     readingTime: calculateReadingTime(post.body)
   })),
   ...devtoPosts
 ].sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+import { db, PageViews, PageLikes } from 'astro:db';
+
+const allViews = await db.select().from(PageViews);
+const allLikes = await db.select().from(PageLikes);
+
+const viewsMap = new Map(allViews.map(v => [v.slug, v.views]));
+const likesMap = new Map(allLikes.map(l => [l.slug, l.likes]));
 ---
 
 <BaseLayout title="Blog | Manthan Ankolekar" description="Thoughts, tutorials, and insights on web development">
@@ -67,6 +76,8 @@ const posts = [
           tags={post.data.tags}
           url={post.url}
           readingTime={post.readingTime}
+          views={post.slug ? viewsMap.get(post.slug) : undefined}
+          likes={post.slug ? likesMap.get(post.slug) : undefined}
         />
       ))}
     </div>

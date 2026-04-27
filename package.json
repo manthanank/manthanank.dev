@@ -12,13 +12,20 @@
   },
   "dependencies": {
     "@astrojs/check": "^0.9.8",
+    "@astrojs/db": "^0.20.1",
+    "@astrojs/netlify": "^7.0.8",
     "@astrojs/rss": "^4.0.18",
     "@astrojs/sitemap": "^3.7.2",
     "@resvg/resvg-js": "^2.6.2",
     "astro": "^6.1.9",
     "canvas-confetti": "^1.9.4",
     "fuse.js": "^7.1.0",
-    "satori": "^0.19.1",
+    "resend": "^6.12.2",
+    "satori": "^0.19.3",
+    "satori-html": "^0.3.2",
     "typescript": "^5.9.3"
+  },
+  "devDependencies": {
+    "@types/canvas-confetti": "^1.9.0"
   }
 }

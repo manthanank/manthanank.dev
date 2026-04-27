@@ -6,9 +6,11 @@ interface Props {
   tags: string[];
   url: string;
   readingTime?: number;
+  views?: number;
+  likes?: number;
 }
 
-const { title, excerpt, date, tags, url, readingTime } = Astro.props;
+const { title, excerpt, date, tags, url, readingTime, views, likes } = Astro.props;
 const isExternal = url.startsWith('http');
 ---
 
@@ -17,6 +19,10 @@ const isExternal = url.startsWith('http');
     <div class="blog-meta-left">
       <time class="blog-date">{date}</time>
       {readingTime && <span class="reading-time">• {readingTime} min read</span>}
+      {views !== undefined && <span class="metrics-separator">•</span>}
+      {views !== undefined && <span class="metrics" title="Views"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg> {views}</span>}
+      {likes !== undefined && <span class="metrics-separator">•</span>}
+      {likes !== undefined && <span class="metrics" title="Likes"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-primary)"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg> {likes}</span>}
     </div>
     <div class="blog-tags">
       {tags.map((tag) => (
@@ -72,6 +78,20 @@ const isExternal = url.startsWith('http');
   }
 
   .reading-time {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+  }
+
+  .metrics-separator {
+    color: var(--color-border);
+    font-size: 0.75rem;
+  }
+
+  .metrics {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
     font-family: var(--font-mono);
     font-size: 0.75rem;
     color: var(--color-text-muted);
