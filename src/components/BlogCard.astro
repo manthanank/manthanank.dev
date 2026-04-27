@@ -51,8 +51,8 @@ const isExternal = url.startsWith('http');
 
   .blog-meta {
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
+    align-items: center;
+    justify-content: flex-start;
     gap: 1rem;
     margin-bottom: 1rem;
     flex-wrap: wrap;
@@ -62,6 +62,7 @@ const isExternal = url.startsWith('http');
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    flex-wrap: wrap;
   }
 
   .blog-date {
@@ -80,11 +81,15 @@ const isExternal = url.startsWith('http');
     display: flex;
     gap: 0.4rem;
     flex-wrap: wrap;
-    justify-content: flex-end;
+    justify-content: flex-start;
     max-width: 100%;
+    align-items: center;
+    flex: 1 1 100%;
   }
 
   .blog-tag {
+    display: inline-flex;
+    align-items: center;
     font-size: 0.7rem;
     font-weight: 600;
     text-transform: uppercase;
@@ -93,8 +98,9 @@ const isExternal = url.startsWith('http');
     background: rgba(124, 58, 237, 0.1);
     padding: 0.15rem 0.5rem;
     border-radius: 4px;
-    max-width: 100%;
-    word-break: break-word;
+    line-height: 1;
+    white-space: nowrap;
+    flex: 0 0 auto;
   }
 
   .blog-title {
@@ -144,6 +150,11 @@ const isExternal = url.startsWith('http');
       margin-bottom: 0.75rem;
     }
 
+    .blog-tags {
+      width: 100%;
+      justify-content: flex-start;
+    }
+
     .blog-title {
       font-size: 1.1rem;
       margin-bottom: 0.5rem;
@@ -175,6 +186,7 @@ const isExternal = url.startsWith('http');
     .blog-tags {
       width: 100%;
       flex-wrap: wrap;
+      justify-content: flex-start;
     }
   }
 
