@@ -1,0 +1,150 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BlogCard from '../../components/BlogCard.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const blog = await getCollection('blog', ({ data }) => !data.draft);
+  const projects = await getCollection('projects');
+
+  const tags = new Set<string>();
+  blog.forEach((p) => (p.data.tags || []).forEach((t) => tags.add(t)));
+  projects.forEach((p) => (p.data.tags || []).forEach((t) => tags.add(t)));
+
+  return Array.from(tags.values()).map((tag) => ({
+    params: { tag: encodeURIComponent(tag) },
+    props: { tag: encodeURIComponent(tag) },
+  }));
+}
+
+const { tag } = Astro.props as { tag: string };
+const decodedTag = decodeURIComponent(tag);
+
+const blog = await getCollection('blog', ({ data }) => !data.draft && (data.tags || []).includes(decodedTag));
+const projects = await getCollection('projects', (p) => (p.data.tags || []).includes(decodedTag));
+
+const sortedBlog = blog.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<BaseLayout
+  title={`${decodedTag} | Tag`}
+  description={`Posts and projects tagged with ${decodedTag}.`}
+  ogId={`tag-${decodedTag}`}
+>
+  <section class="section tag-hero">
+    <div class="container">
+      <h1 class="section-title">#{decodedTag}</h1>
+      <p class="section-subtitle">
+        {sortedBlog.length + projects.length} item{sortedBlog.length + projects.length === 1 ? '' : 's'} tagged with <strong>{decodedTag}</strong>.
+      </p>
+      <div class="tag-actions">
+        <a class="btn btn-outline" href="/tags">All tags</a>
+        <a class="btn btn-primary" href="/blog">Browse blog</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="container tag-section">
+    {sortedBlog.length > 0 && (
+      <div class="tag-block">
+        <h2 class="block-title">Blog</h2>
+        <div class="grid">
+          {sortedBlog.map((post) => (
+            <BlogCard
+              title={post.data.title}
+              excerpt={post.data.description}
+              date={post.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+              tags={post.data.tags}
+              url={`/blog/${post.id}`}
+              readingTime={Math.max(1, Math.round((post.body?.split(/\s+/g).length || 0) / 200))}
+            />
+          ))}
+        </div>
+      </div>
+    )}
+
+    {projects.length > 0 && (
+      <div class="tag-block">
+        <h2 class="block-title">Projects</h2>
+        <div class="grid">
+          {projects.map((p) => (
+            <ProjectCard
+              title={p.data.title}
+              description={p.data.description}
+              tags={p.data.tags}
+              github={p.data.github}
+              live={p.data.live}
+              slug={p.id}
+            />
+          ))}
+        </div>
+      </div>
+    )}
+
+    {sortedBlog.length === 0 && projects.length === 0 && (
+      <div class="empty-state">
+        <p>No items found for this tag.</p>
+        <a class="btn btn-outline" href="/tags">Browse all tags</a>
+      </div>
+    )}
+  </section>
+</BaseLayout>
+
+<style>
+  .tag-hero {
+    padding-top: 8rem;
+    padding-bottom: 0;
+  }
+
+  .tag-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1.75rem;
+  }
+
+  .tag-section {
+    padding-bottom: 5rem;
+  }
+
+  .tag-block {
+    margin-top: 2.5rem;
+  }
+
+  .block-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-text-muted);
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+    gap: 1.5rem;
+  }
+
+  .empty-state {
+    margin-top: 2rem;
+    padding: 3rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-bg-card);
+    text-align: center;
+    color: var(--color-text-muted);
+  }
+
+  .empty-state p {
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .tag-hero {
+      padding-top: 6rem;
+    }
+  }
+</style>
+

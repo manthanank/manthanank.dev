@@ -1,0 +1,89 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BlogCard from '../../components/BlogCard.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft && !!data.series);
+  const series = new Set<string>();
+  posts.forEach((p) => {
+    if (p.data.series) series.add(p.data.series);
+  });
+
+  return Array.from(series.values()).map((name) => ({
+    params: { series: encodeURIComponent(name) },
+    props: { series: encodeURIComponent(name) },
+  }));
+}
+
+const { series } = Astro.props as { series: string };
+const decodedSeries = decodeURIComponent(series);
+
+const posts = await getCollection('blog', ({ data }) => !data.draft && data.series === decodedSeries);
+const sorted = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<BaseLayout
+  title={`${decodedSeries} | Series`}
+  description={`Posts in the "${decodedSeries}" series.`}
+  ogId={`series-${decodedSeries}`}
+>
+  <section class="section series-hero">
+    <div class="container">
+      <h1 class="section-title">{decodedSeries}</h1>
+      <p class="section-subtitle">
+        {sorted.length} post{sorted.length === 1 ? '' : 's'} in this series.
+      </p>
+      <div class="series-actions">
+        <a class="btn btn-outline" href="/series">All series</a>
+        <a class="btn btn-primary" href="/blog">Browse blog</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="container series-section">
+    <div class="grid">
+      {sorted.map((post) => (
+        <BlogCard
+          title={post.data.title}
+          excerpt={post.data.description}
+          date={post.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+          tags={post.data.tags}
+          url={`/blog/${post.id}`}
+          readingTime={Math.max(1, Math.round((post.body?.split(/\s+/g).length || 0) / 200))}
+        />
+      ))}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .series-hero {
+    padding-top: 8rem;
+    padding-bottom: 0;
+  }
+
+  .series-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1.75rem;
+  }
+
+  .series-section {
+    padding-bottom: 5rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .series-hero {
+      padding-top: 6rem;
+    }
+  }
+</style>
+

@@ -1,0 +1,246 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Search | Manthan Ankolekar" description="Search posts and projects.">
+  <section class="section search-hero">
+    <div class="container">
+      <h1 class="section-title">Search</h1>
+      <p class="section-subtitle">Search across blog posts and projects.</p>
+    </div>
+  </section>
+
+  <section class="container search-section">
+    <div class="search-card">
+      <div class="search-input">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="q" type="search" placeholder="Search… (try: Angular, RxJS, Node)" autocomplete="off" spellcheck="false" />
+        <kbd class="kbd">/</kbd>
+      </div>
+
+      <div id="results" class="results" aria-live="polite"></div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import Fuse from 'fuse.js';
+
+  type Item = {
+    title: string;
+    description: string;
+    url: string;
+    tags: string[];
+    type: 'blog' | 'project';
+  };
+
+  const input = document.getElementById('q') as HTMLInputElement | null;
+  const results = document.getElementById('results');
+
+  let fuse: Fuse<Item> | null = null;
+  let items: Item[] = [];
+
+  async function load() {
+    const res = await fetch('/search.json');
+    items = await res.json();
+    fuse = new Fuse(items, {
+      keys: [
+        { name: 'title', weight: 0.45 },
+        { name: 'description', weight: 0.35 },
+        { name: 'tags', weight: 0.2 },
+      ],
+      threshold: 0.4,
+      distance: 120,
+      minMatchCharLength: 2,
+      ignoreLocation: true,
+    });
+    render(items.slice(0, 12));
+  }
+
+  function render(list: Item[], query?: string) {
+    if (!results) return;
+    if (list.length === 0) {
+      results.innerHTML = `<div class="empty">No results${query ? ` for "<strong>${query}</strong>"` : ''}.</div>`;
+      return;
+    }
+
+    results.innerHTML = list
+      .map((item) => {
+        const badge = item.type === 'blog' ? 'Blog' : 'Project';
+        return `
+          <a class="result" href="${item.url}">
+            <div class="result-top">
+              <div class="result-title">${item.title}</div>
+              <span class="badge">${badge}</span>
+            </div>
+            <div class="result-desc">${item.description ?? ''}</div>
+            ${
+              item.tags?.length
+                ? `<div class="result-tags">${item.tags.slice(0, 4).map((t) => `<span class="tag">${t}</span>`).join('')}</div>`
+                : ''
+            }
+          </a>
+        `;
+      })
+      .join('');
+  }
+
+  function onInput() {
+    const q = input?.value.trim() || '';
+    if (!q) {
+      render(items.slice(0, 12));
+      return;
+    }
+    const found = fuse?.search(q).slice(0, 15).map((r) => r.item) || [];
+    render(found, q);
+  }
+
+  function init() {
+    load().catch(() => {});
+    input?.addEventListener('input', onInput);
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === '/' && document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        input?.focus();
+      }
+    });
+  }
+
+  init();
+  document.addEventListener('astro:after-swap', init);
+</script>
+
+<style>
+  .search-hero {
+    padding-top: 8rem;
+    padding-bottom: 0;
+  }
+
+  .search-section {
+    padding-bottom: 5rem;
+    max-width: 950px;
+  }
+
+  .search-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+  }
+
+  .search-input {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--color-bg-alt);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    color: var(--color-text-muted);
+  }
+
+  .search-input input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: none;
+    color: var(--color-text);
+    font-size: 1.05rem;
+    width: 100%;
+  }
+
+  .kbd {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    padding: 2px 7px;
+    border-radius: 6px;
+    color: var(--color-text-muted);
+  }
+
+  .results {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .result {
+    display: block;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 1rem;
+    transition: all var(--transition);
+    color: var(--color-text);
+  }
+
+  .result:hover {
+    border-color: var(--color-primary);
+    transform: translateY(-1px);
+    box-shadow: 0 12px 30px rgba(0, 212, 255, 0.1);
+    color: var(--color-text);
+  }
+
+  .result-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .result-title {
+    font-weight: 700;
+  }
+
+  .badge {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+    background: var(--color-bg-alt);
+    flex: 0 0 auto;
+  }
+
+  .result-desc {
+    margin-top: 0.4rem;
+    color: var(--color-text-muted);
+    font-size: 0.92rem;
+    line-height: 1.6;
+  }
+
+  .result-tags {
+    margin-top: 0.6rem;
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-accent-light);
+    background: rgba(124, 58, 237, 0.12);
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+  }
+
+  .empty {
+    color: var(--color-text-muted);
+    text-align: center;
+    padding: 2rem 1rem;
+  }
+
+  @media (max-width: 768px) {
+    .search-hero {
+      padding-top: 6rem;
+    }
+  }
+</style>
+

@@ -1,0 +1,109 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('blog', ({ data }) => !data.draft && !!data.series);
+
+const counts = new Map<string, number>();
+posts.forEach((p) => {
+  const series = p.data.series?.trim();
+  if (!series) return;
+  counts.set(series, (counts.get(series) ?? 0) + 1);
+});
+
+const seriesList = Array.from(counts.entries())
+  .map(([name, count]) => ({ name, count }))
+  .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+---
+
+<BaseLayout title="Series | Manthan Ankolekar" description="Browse blog series.">
+  <section class="section series-hero">
+    <div class="container">
+      <h1 class="section-title">Series</h1>
+      <p class="section-subtitle">Longer, connected post collections.</p>
+    </div>
+  </section>
+
+  <section class="container series-section">
+    {seriesList.length === 0 ? (
+      <div class="empty-state">
+        <p>No series yet.</p>
+        <a class="btn btn-outline" href="/blog">Browse blog</a>
+      </div>
+    ) : (
+      <div class="series-grid">
+        {seriesList.map((s) => (
+          <a class="series-card" href={`/series/${encodeURIComponent(s.name)}`}>
+            <div class="series-name">{s.name}</div>
+            <div class="series-count">{s.count} post{s.count === 1 ? '' : 's'}</div>
+          </a>
+        ))}
+      </div>
+    )}
+  </section>
+</BaseLayout>
+
+<style>
+  .series-hero {
+    padding-top: 8rem;
+    padding-bottom: 0;
+  }
+
+  .series-section {
+    padding-bottom: 5rem;
+  }
+
+  .series-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
+    gap: 1rem;
+  }
+
+  .series-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    transition: all var(--transition);
+    color: var(--color-text);
+  }
+
+  .series-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-accent);
+    box-shadow: 0 12px 30px rgba(124, 58, 237, 0.14);
+    color: var(--color-text);
+  }
+
+  .series-name {
+    font-weight: 800;
+    margin-bottom: 0.35rem;
+  }
+
+  .series-count {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+  }
+
+  .empty-state {
+    margin-top: 2rem;
+    padding: 3rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-bg-card);
+    text-align: center;
+    color: var(--color-text-muted);
+  }
+
+  .empty-state p {
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .series-hero {
+      padding-top: 6rem;
+    }
+  }
+</style>
+

@@ -20,7 +20,7 @@ const isExternal = url.startsWith('http');
     </div>
     <div class="blog-tags">
       {tags.map((tag) => (
-        <span class="blog-tag">{tag}</span>
+        <a class="blog-tag" href={`/tags/${encodeURIComponent(tag)}`}>{tag}</a>
       ))}
     </div>
   </div>

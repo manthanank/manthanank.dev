@@ -1,0 +1,105 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const blog = await getCollection('blog', ({ data }) => !data.draft);
+const projects = await getCollection('projects');
+
+const counts = new Map<string, { count: number; types: Set<string> }>();
+
+function addTag(tag: string, type: 'Blog' | 'Projects') {
+  const key = tag.trim();
+  if (!key) return;
+  const existing = counts.get(key) ?? { count: 0, types: new Set<string>() };
+  existing.count += 1;
+  existing.types.add(type);
+  counts.set(key, existing);
+}
+
+blog.forEach((p) => (p.data.tags || []).forEach((t) => addTag(t, 'Blog')));
+projects.forEach((p) => (p.data.tags || []).forEach((t) => addTag(t, 'Projects')));
+
+const tags = Array.from(counts.entries())
+  .map(([tag, meta]) => ({ tag, count: meta.count, types: Array.from(meta.types.values()) }))
+  .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
+---
+
+<BaseLayout title="Tags | Manthan Ankolekar" description="Browse posts and projects by topic.">
+  <section class="section tags-hero">
+    <div class="container">
+      <h1 class="section-title">Tags</h1>
+      <p class="section-subtitle">Browse posts and projects by topic.</p>
+    </div>
+  </section>
+
+  <section class="container tags-section">
+    <div class="tags-grid">
+      {tags.map((t) => (
+        <a class="tag-card" href={`/tags/${encodeURIComponent(t.tag)}`}>
+          <div class="tag-name">{t.tag}</div>
+          <div class="tag-meta">
+            <span class="tag-count">{t.count} item{t.count === 1 ? '' : 's'}</span>
+            <span class="tag-types">{t.types.join(' • ')}</span>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .tags-hero {
+    padding-top: 8rem;
+    padding-bottom: 0;
+  }
+
+  .tags-section {
+    padding-bottom: 5rem;
+  }
+
+  .tags-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
+    gap: 1rem;
+  }
+
+  .tag-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.25rem 1.1rem;
+    transition: all var(--transition);
+    color: var(--color-text);
+  }
+
+  .tag-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-primary);
+    box-shadow: 0 12px 30px rgba(0, 212, 255, 0.12);
+    color: var(--color-text);
+  }
+
+  .tag-name {
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.35rem;
+  }
+
+  .tag-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+  }
+
+  @media (max-width: 768px) {
+    .tags-hero {
+      padding-top: 6rem;
+    }
+  }
+</style>
+
