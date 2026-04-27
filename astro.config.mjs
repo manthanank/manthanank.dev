@@ -7,6 +7,7 @@ import netlify from '@astrojs/netlify';
 
 export default defineConfig({
   site: 'https://manthanank.dev',
+  output: 'server',
   integrations: [sitemap(), db()],
   adapter: netlify(),
 });

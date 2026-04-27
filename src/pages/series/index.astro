@@ -11,6 +11,8 @@ posts.forEach((p) => {
   counts.set(series, (counts.get(series) ?? 0) + 1);
 });
 
+const toSlug = (name: string) => name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+
 const seriesList = Array.from(counts.entries())
   .map(([name, count]) => ({ name, count }))
   .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
@@ -33,7 +35,7 @@ const seriesList = Array.from(counts.entries())
     ) : (
       <div class="series-grid">
         {seriesList.map((s) => (
-          <a class="series-card" href={`/series/${encodeURIComponent(s.name)}`}>
+          <a class="series-card" href={`/series/${toSlug(s.name)}`}>
             <div class="series-name">{s.name}</div>
             <div class="series-count">{s.count} post{s.count === 1 ? '' : 's'}</div>
           </a>

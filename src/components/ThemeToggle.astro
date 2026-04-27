@@ -34,7 +34,7 @@
     };
 
     // Initial check
-    setTheme(getTheme());
+    setTheme(getTheme() ?? 'dark');
 
     themeToggle?.addEventListener('click', () => {
       const currentTheme = document.documentElement.getAttribute('data-theme');

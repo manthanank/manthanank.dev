@@ -3,24 +3,19 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import BlogCard from '../../components/BlogCard.astro';
 import { getCollection } from 'astro:content';
 
-export async function getStaticPaths() {
-  const posts = await getCollection('blog', ({ data }) => !data.draft && !!data.series);
-  const series = new Set<string>();
-  posts.forEach((p) => {
-    if (p.data.series) series.add(p.data.series);
-  });
+const toSlug = (name: string) => name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
 
-  return Array.from(series.values()).map((name) => ({
-    params: { series: encodeURIComponent(name) },
-    props: { series: encodeURIComponent(name) },
-  }));
-}
+const { series: seriesSlug } = Astro.params;
 
-const { series } = Astro.props as { series: string };
-const decodedSeries = decodeURIComponent(series);
+// Find the actual series name from the slug
+const allPosts = await getCollection('blog', ({ data }) => !data.draft && !!data.series);
+const seriesName = allPosts.find(p => p.data.series && toSlug(p.data.series) === seriesSlug)?.data.series;
 
-const posts = await getCollection('blog', ({ data }) => !data.draft && data.series === decodedSeries);
+if (!seriesName) return Astro.redirect('/series');
+
+const posts = allPosts.filter(p => p.data.series === seriesName);
 const sorted = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const decodedSeries = seriesName;
 ---
 
 <BaseLayout
@@ -28,7 +23,7 @@ const sorted = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.va
   description={`Posts in the "${decodedSeries}" series.`}
   ogId={`series-${decodedSeries}`}
 >
-  <section class="section series-hero">
+  <section class="series-hero">
     <div class="container">
       <h1 class="section-title">{decodedSeries}</h1>
       <p class="section-subtitle">
@@ -59,8 +54,8 @@ const sorted = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.va
 
 <style>
   .series-hero {
-    padding-top: 8rem;
-    padding-bottom: 0;
+    padding-top: 7rem;
+    padding-bottom: 2rem;
   }
 
   .series-actions {
@@ -71,6 +66,7 @@ const sorted = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.va
   }
 
   .series-section {
+    padding-top: 2.5rem;
     padding-bottom: 5rem;
   }
 

@@ -4,6 +4,7 @@ import SkillBadge from '../components/SkillBadge.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import BlogCard from '../components/BlogCard.astro';
 import { getCollection } from 'astro:content';
+import { db, PageViews, PageLikes } from 'astro:db';
 
 const skills = [
   'Angular', 'RxJS', 'Node.js', 'Express.js', 'TypeScript',
@@ -146,13 +147,11 @@ const latestPosts = [
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
   .slice(0, 3);
 
-import { db, PageViews, PageLikes } from 'astro:db';
-
 const allViews = await db.select().from(PageViews);
 const allLikes = await db.select().from(PageLikes);
 
-const viewsMap = new Map(allViews.map(v => [v.slug, v.views]));
-const likesMap = new Map(allLikes.map(l => [l.slug, l.likes]));
+const viewsMap = new Map(allViews.map(v => [v.slug, v.count]));
+const likesMap = new Map(allLikes.map(l => [l.slug, l.count]));
 ---
 
 <BaseLayout title="Manthan Ankolekar | Full Stack Developer">
