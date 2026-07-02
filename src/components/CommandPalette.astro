@@ -67,12 +67,26 @@
     { title: 'About', description: 'Learn more about me', url: '/about', type: 'page', category: tPages },
     { title: 'Projects', description: 'View my work', url: '/projects', type: 'page', category: tPages },
     { title: 'Blog', description: 'Read my articles', url: '/blog', type: 'page', category: tPages },
+    { title: 'Snippets', description: 'Bite-sized code snippets and TILs', url: '/snippets', type: 'page', category: tPages },
     { title: 'Tags', description: 'Browse by topic', url: '/tags', type: 'page', category: tPages },
     { title: 'Series', description: 'Browse blog series', url: '/series', type: 'page', category: tPages },
+    { title: 'NPM Packages', description: 'Open-source packages I\'ve published', url: '/packages', type: 'page', category: tPages },
+    { title: 'Timeline', description: 'My career journey from student to developer', url: '/timeline', type: 'page', category: tPages },
+    { title: 'Bookmarks', description: 'Curated tools, resources, and links I use', url: '/bookmarks', type: 'page', category: tPages },
+    { title: 'Ask Me Anything', description: 'Submit a question and I\'ll answer publicly', url: '/ama', type: 'page', category: tPages },
     { title: 'Guestbook', description: 'Leave a note', url: '/guestbook', type: 'page', category: tPages },
     { title: 'Contact', description: 'Get in touch', url: '/contact', type: 'page', category: tPages },
+    { title: 'Dashboard', description: 'View real-time developer telemetry', url: '/dashboard', type: 'page', category: tPages },
+    { title: 'Now', description: 'What I\'m focused on right now', url: '/now', type: 'page', category: tPages },
+    { title: 'Uses', description: 'Hardware and software I use daily', url: '/uses', type: 'page', category: tPages },
+    { title: 'AI Assistant', description: 'Talk to my Gemini-powered AI chatbot', url: '/chat', type: 'page', category: tPages },
+    { title: 'Admin Portal', description: 'Secure database management', url: '/admin', type: 'page', category: tPages },
     { title: 'Switch to Dark Mode', description: 'Change theme to dark', action: 'theme-dark', type: 'action', category: tActions },
     { title: 'Switch to Light Mode', description: 'Change theme to light', action: 'theme-light', type: 'action', category: tActions },
+    { title: 'Switch to Catppuccin Theme', description: 'Soothing pastel theme', action: 'theme-catppuccin', type: 'action', category: tActions },
+    { title: 'Switch to Tokyo Night Theme', description: 'Clean neon aesthetic', action: 'theme-tokyonight', type: 'action', category: tActions },
+    { title: 'Switch to Gruvbox Theme', description: 'Warm retro aesthetic', action: 'theme-gruvbox', type: 'action', category: tActions },
+    { title: 'Switch to Nord Theme', description: 'Cool arctic aesthetic', action: 'theme-nord', type: 'action', category: tActions },
     { title: 'Download Resume', description: 'Get a copy of my CV', action: 'resume-download', type: 'action', category: tActions },
   ];
 
@@ -166,7 +180,7 @@
     }, {} as Record<string, PaletteItem[]>);
 
     let html = '';
-    const categories = [tActions, tPages, 'Projects', 'Blog'];
+    const categories = ['Calculations', tActions, tPages, 'Projects', 'Blog'];
     
     categories.forEach(cat => {
       if (grouped[cat]) {
@@ -174,7 +188,7 @@
         grouped[cat].forEach((item) => {
           const isAction = item.type === 'action';
           const link = isAction ? '#' : item.url;
-          const icon = getIcon(item.type);
+          const icon = getIcon(item.type, item.action);
           
           html += `
             <a href="${link}" class="palette-item" data-action="${item.action || ''}" data-type="${item.type}">
@@ -201,9 +215,27 @@
         }
       });
     });
+
+    resultsList.querySelectorAll('.palette-item[data-action^="theme-"]').forEach(el => {
+      const action = (el as HTMLElement).dataset.action;
+      if (!action) return;
+      const theme = action.replace('theme-', '');
+
+      el.addEventListener('mouseenter', () => {
+        document.documentElement.setAttribute('data-theme', theme);
+      });
+
+      el.addEventListener('mouseleave', () => {
+        const currentActiveTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', currentActiveTheme);
+      });
+    });
   }
 
-  function getIcon(type: string) {
+  function getIcon(type: string, action?: string) {
+    if (type === 'action' && action?.startsWith('copy-calc:')) {
+      return '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>';
+    }
     switch(type) {
       case 'action': return '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>';
       case 'page': return '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>';
@@ -214,6 +246,18 @@
   }
 
   function handleAction(action: string) {
+    if (action.startsWith('copy-calc:')) {
+      const valToCopy = action.replace('copy-calc:', '');
+      navigator.clipboard.writeText(valToCopy).catch(() => {});
+      // Play pop synthesized sound
+      // @ts-ignore
+      if (window.playSynthSound) {
+        // @ts-ignore
+        window.playSynthSound('click');
+      }
+      togglePalette(false);
+      return;
+    }
     togglePalette(false);
     switch(action) {
       case 'theme-dark':
@@ -223,6 +267,22 @@
       case 'theme-light':
         document.documentElement.setAttribute('data-theme', 'light');
         localStorage.setItem('theme', 'light');
+        break;
+      case 'theme-catppuccin':
+        document.documentElement.setAttribute('data-theme', 'catppuccin');
+        localStorage.setItem('theme', 'catppuccin');
+        break;
+      case 'theme-tokyonight':
+        document.documentElement.setAttribute('data-theme', 'tokyonight');
+        localStorage.setItem('theme', 'tokyonight');
+        break;
+      case 'theme-gruvbox':
+        document.documentElement.setAttribute('data-theme', 'gruvbox');
+        localStorage.setItem('theme', 'gruvbox');
+        break;
+      case 'theme-nord':
+        document.documentElement.setAttribute('data-theme', 'nord');
+        localStorage.setItem('theme', 'nord');
         break;
       case 'resume-download':
         const link = document.createElement('a');
@@ -285,7 +345,30 @@
       renderResults([...staticActions, ...dynamicItems]);
       return;
     }
-    const results = fuse?.search(val).map(r => r.item) || [];
+    
+    let results = fuse?.search(val).map(r => r.item) || [];
+    
+    // Check for math evaluation (digits and math operators)
+    try {
+      if (/^[0-9+\-*/().\s%]+$/.test(val) && /[0-9]/.test(val) && /[+\-*/%]/.test(val)) {
+        if (!/\*\*|\/\/|--|\+\+|\.\./.test(val)) {
+          const result = new Function(`return (${val})`)();
+          if (typeof result === 'number' && !isNaN(result) && isFinite(result)) {
+            const mathItem: PaletteItem = {
+              title: `Result: ${result}`,
+              description: `Press Enter to copy result (${result}) to clipboard`,
+              action: `copy-calc:${result}`,
+              type: 'action',
+              category: 'Calculations'
+            };
+            results = [mathItem, ...results];
+          }
+        }
+      }
+    } catch (e) {
+      // Ignore partial/invalid math evaluation states
+    }
+    
     renderResults(results, val);
   });
 

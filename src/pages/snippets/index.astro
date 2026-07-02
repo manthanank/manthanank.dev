@@ -6,6 +6,8 @@ const snippets = await getCollection('snippets');
 const sortedSnippets = snippets.sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
+
+const allTags = Array.from(new Set(sortedSnippets.flatMap(s => s.data.tags || []))).sort();
 ---
 
 <BaseLayout title="Snippets | Manthan Ankolekar" description="Bite-sized code snippets and today I learned (TIL) moments.">
@@ -17,27 +19,87 @@ const sortedSnippets = snippets.sort(
   </section>
 
   <section class="container snippets-content">
-    <div class="snippets-grid">
+    <!-- Search + Filter -->
+    <div class="snippets-controls reveal">
+      <div class="snippets-search-wrapper">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="snippet-search" type="search" placeholder="Search snippets…" autocomplete="off" aria-label="Search snippets" />
+        <span id="snippet-count" class="snippet-count">{sortedSnippets.length} snippets</span>
+      </div>
+      <div class="snippet-tag-filters">
+        <button class="snippet-tag-btn active" data-tag="all">All</button>
+        {allTags.map(tag => (
+          <button class="snippet-tag-btn" data-tag={tag.toLowerCase()}>{tag}</button>
+        ))}
+      </div>
+    </div>
+
+    <div class="snippets-grid" id="snippets-grid">
       {sortedSnippets.map(snippet => (
-        <a href={`/snippets/${snippet.id}`} class="snippet-card">
-          <div class="snippet-date">{snippet.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
-          <h2 class="snippet-title">{snippet.data.title}</h2>
-          <p class="snippet-description">{snippet.data.description}</p>
-          <div class="snippet-tags">
-            {snippet.data.tags.map(tag => (
-              <span class="snippet-tag">{tag}</span>
-            ))}
-          </div>
-        </a>
+        <div class="snippet-item" data-title={snippet.data.title.toLowerCase()} data-tags={snippet.data.tags.map(t => t.toLowerCase()).join(' ')}>
+          <a href={`/snippets/${snippet.id}`} class="snippet-card">
+            <div class="snippet-date">{snippet.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+            <h2 class="snippet-title">{snippet.data.title}</h2>
+            <p class="snippet-description">{snippet.data.description}</p>
+            <div class="snippet-tags">
+              {snippet.data.tags.map(tag => (
+                <span class="snippet-tag">{tag}</span>
+              ))}
+            </div>
+          </a>
+        </div>
       ))}
+    </div>
+
+    <div id="snippets-empty" class="snippets-empty" style="display:none;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <p>No snippets match. Try a different search.</p>
     </div>
   </section>
 </BaseLayout>
 
+<script>
+  function initSnippetFilter() {
+    const searchInput = document.getElementById('snippet-search') as HTMLInputElement;
+    const tagBtns = document.querySelectorAll('.snippet-tag-btn');
+    const items = document.querySelectorAll('.snippet-item') as NodeListOf<HTMLElement>;
+    const countEl = document.getElementById('snippet-count');
+    const emptyEl = document.getElementById('snippets-empty');
+    if (!searchInput) return;
+    let activeTag = 'all', query = '';
+
+    function filter() {
+      let visible = 0;
+      items.forEach(item => {
+        const title = item.dataset.title || '';
+        const tags  = item.dataset.tags  || '';
+        const ms = !query || title.includes(query) || tags.includes(query);
+        const mt = activeTag === 'all' || tags.split(' ').some(t => t === activeTag);
+        item.style.display = (ms && mt) ? '' : 'none';
+        if (ms && mt) visible++;
+      });
+      if (countEl) countEl.textContent = visible + ' snippet' + (visible !== 1 ? 's' : '');
+      if (emptyEl) emptyEl.style.display = visible === 0 ? 'flex' : 'none';
+    }
+
+    searchInput.addEventListener('input', () => { query = searchInput.value.trim().toLowerCase(); filter(); });
+    tagBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tagBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeTag = btn.getAttribute('data-tag') || 'all';
+        filter();
+      });
+    });
+  }
+  initSnippetFilter();
+  document.addEventListener('astro:after-swap', initSnippetFilter);
+</script>
+
 <style>
   .snippets-hero {
     padding-top: 8rem;
-    padding-bottom: 2rem;
+    padding-bottom: 0;
   }
 
   .snippets-content {
@@ -45,6 +107,21 @@ const sortedSnippets = snippets.sort(
     margin: 0 auto;
     padding-bottom: 4rem;
   }
+
+  .snippets-controls { margin: 2rem 0; display: flex; flex-direction: column; gap: 1rem; }
+  .snippets-search-wrapper { display: flex; align-items: center; gap: 0.75rem; background: var(--color-bg-card); border: 1px solid var(--color-border); border-radius: var(--radius); padding: 0.75rem 1.25rem; transition: border-color var(--transition); }
+  .snippets-search-wrapper:focus-within { border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(0,212,255,0.08); }
+  .snippets-search-wrapper svg { color: var(--color-text-muted); flex-shrink: 0; }
+  #snippet-search { flex: 1; border: none; outline: none; background: none; color: var(--color-text); font-size: 1rem; font-family: var(--font-sans); }
+  #snippet-search::placeholder { color: var(--color-text-muted); }
+  .snippet-count { font-size: 0.82rem; font-family: var(--font-mono); color: var(--color-text-muted); white-space: nowrap; background: var(--color-bg-alt); padding: 0.2rem 0.6rem; border-radius: 20px; border: 1px solid var(--color-border); }
+  .snippet-tag-filters { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .snippet-tag-btn { font-size: 0.82rem; font-weight: 600; padding: 0.35rem 0.85rem; border-radius: 99px; background: var(--color-bg-alt); border: 1px solid var(--color-border); color: var(--color-text-muted); cursor: pointer; transition: all var(--transition); white-space: nowrap; font-family: inherit; }
+  .snippet-tag-btn:hover { border-color: var(--color-accent); color: var(--color-accent-light); }
+  .snippet-tag-btn.active { background: var(--color-accent); color: #fff; border-color: var(--color-accent); box-shadow: 0 4px 12px rgba(124,58,237,0.25); }
+  .snippet-item { display: block; }
+  .snippets-empty { display: flex; flex-direction: column; align-items: center; gap: 1rem; padding: 4rem 2rem; text-align: center; color: var(--color-text-muted); border: 1px dashed var(--color-border); border-radius: var(--radius); }
+  .snippets-empty svg { opacity: 0.4; }
 
   .snippets-grid {
     display: grid;

@@ -136,6 +136,8 @@ const experience = [
       'Worked on microservice architectures, ensuring efficient communication between services',
       'Focused on creating efficient, user-centric applications following industry best practices',
     ],
+    skills: ['Angular', 'TypeScript', 'RxJS', 'Microservices', 'Git'],
+    colleagues: ['Product Managers', 'UI/UX Designers', 'Backend Developers']
   },
   {
     title: 'Software Engineer',
@@ -147,6 +149,8 @@ const experience = [
       'Integrated real-time notifications using WebSockets for timely updates',
       'Refactored and optimized code, reducing build size by more than 50%',
     ],
+    skills: ['Angular', 'Node.js', 'MySQL', 'WebSockets', 'AWS', 'REST APIs'],
+    colleagues: ['Hospital Management Stakeholders', 'DevOps Engineers']
   },
   {
     title: 'Full Stack Developer Intern',
@@ -157,6 +161,8 @@ const experience = [
       'Used Angular, Node.js, Python, and Firebase for frontend, backend, and real-time data management',
       'Deployed solutions on AWS and ensured application performance post-deployment',
     ],
+    skills: ['Angular', 'Node.js', 'Python', 'Firebase', 'AWS'],
+    colleagues: ['Technical Team Lead', 'Senior Developers']
   },
   {
     title: 'Angular Developer Intern',
@@ -167,6 +173,8 @@ const experience = [
       'Applied Angular best practices such as modular architecture and reusable components',
       'Integrated backend RESTful APIs and conducted comprehensive testing',
     ],
+    skills: ['Angular', 'REST APIs', 'Modular Architecture', 'UI/UX'],
+    colleagues: ['IoT Dashboard Developers', 'Hardware Engineers']
   },
   {
     title: 'Front End Trainee',
@@ -177,6 +185,8 @@ const experience = [
       'Developed a Corona Tracker application using Angular and REST APIs',
       'Improved skills in API integration and asynchronous data handling',
     ],
+    skills: ['HTML', 'CSS', 'JavaScript', 'jQuery', 'Angular'],
+    colleagues: ['Training Mentors', 'Student Cohorts']
   },
   {
     title: 'Student Intern',
@@ -187,6 +197,8 @@ const experience = [
       'Developed a text-to-speech conversion application in Python using relevant libraries',
       'Explored Python libraries and frameworks for implementing speech synthesis',
     ],
+    skills: ['Python', 'Machine Learning', 'Speech Synthesis', 'NLP'],
+    colleagues: ['Research Mentors', 'Lab Partners']
   },
 ];
 
@@ -316,6 +328,19 @@ const {
       <h2 class="section-title">Skills</h2>
       <p class="section-subtitle">My core competencies and areas of expertise</p>
  
+      <!-- Proficiency Chart -->
+      <div class="proficiency-chart reveal" id="proficiency-chart">
+        <h3 class="chart-heading">Proficiency Overview</h3>
+        <div class="chart-bars">
+          <div class="chart-row"><span class="chart-label">Angular / Frontend</span><div class="chart-bar-track"><div class="chart-bar" data-pct="92"><span class="chart-pct">92%</span></div></div></div>
+          <div class="chart-row"><span class="chart-label">TypeScript</span><div class="chart-bar-track"><div class="chart-bar" data-pct="88"><span class="chart-pct">88%</span></div></div></div>
+          <div class="chart-row"><span class="chart-label">RxJS</span><div class="chart-bar-track"><div class="chart-bar" data-pct="84"><span class="chart-pct">84%</span></div></div></div>
+          <div class="chart-row"><span class="chart-label">Node.js / Express</span><div class="chart-bar-track"><div class="chart-bar bar-backend" data-pct="80"><span class="chart-pct">80%</span></div></div></div>
+          <div class="chart-row"><span class="chart-label">Databases (SQL/NoSQL)</span><div class="chart-bar-track"><div class="chart-bar bar-backend" data-pct="75"><span class="chart-pct">75%</span></div></div></div>
+          <div class="chart-row"><span class="chart-label">Cloud (AWS/GCP/Azure)</span><div class="chart-bar-track"><div class="chart-bar bar-cloud" data-pct="65"><span class="chart-pct">65%</span></div></div></div>
+        </div>
+      </div>
+
       <div class="skills-categories">
         <div class="skill-category">
           <h3 class="category-title">Frontend</h3>
@@ -419,6 +444,48 @@ const {
     </div>
   </section>
 
+  <!-- Premium Glassmorphic Milestone Dialog Modal -->
+  <div id="milestone-modal" class="milestone-modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-backdrop"></div>
+    <div class="modal-wrapper">
+      <div class="modal-container">
+        <button class="modal-close" aria-label="Close dialog">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <div class="modal-body">
+          <div class="modal-header">
+            <span class="modal-meta-period">Oct 2024 - Jan 2025</span>
+            <h3 class="modal-title">Software Developer</h3>
+            <p class="modal-company">Senwell Group Pvt Ltd</p>
+          </div>
+          
+          <div class="modal-section">
+            <h4 class="modal-section-title">Key Accomplishments</h4>
+            <ul class="modal-accomplishments-list">
+              <!-- Dynamically populated -->
+            </ul>
+          </div>
+
+          <div class="modal-row-grid">
+            <div class="modal-section">
+              <h4 class="modal-section-title">Mastered Skills</h4>
+              <div class="modal-skills-grid">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4 class="modal-section-title">Collaborations & Teams</h4>
+              <div class="modal-colleagues-list">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     function initTimeline() {
       const timeline = document.querySelector('.experience-timeline');
@@ -456,15 +523,202 @@ const {
       });
     }
 
+    function initMilestonePopups() {
+      const cards = document.querySelectorAll('[data-milestone]');
+      const modal = document.getElementById('milestone-modal');
+      const backdrop = modal?.querySelector('.modal-backdrop');
+      const closeBtn = modal?.querySelector('.modal-close');
+
+      if (!modal || !closeBtn) return;
+
+      function openModal(card: Element) {
+        const title = card.getAttribute('data-title') || '';
+        const company = card.getAttribute('data-company') || '';
+        const period = card.getAttribute('data-period') || '';
+        const description = JSON.parse(card.getAttribute('data-description') || '[]');
+        const skills = JSON.parse(card.getAttribute('data-skills') || '[]');
+        const colleagues = JSON.parse(card.getAttribute('data-colleagues') || '[]');
+
+        const periodEl = modal!.querySelector('.modal-meta-period');
+        const titleEl = modal!.querySelector('.modal-title');
+        const companyEl = modal!.querySelector('.modal-company');
+        const accomplishmentsEl = modal!.querySelector('.modal-accomplishments-list');
+        const skillsEl = modal!.querySelector('.modal-skills-grid');
+        const colleaguesEl = modal!.querySelector('.modal-colleagues-list');
+
+        if (periodEl) periodEl.textContent = period;
+        if (titleEl) titleEl.textContent = title;
+        if (companyEl) companyEl.textContent = company;
+
+        if (accomplishmentsEl) {
+          accomplishmentsEl.innerHTML = description.map((desc: string) => `<li>${desc}</li>`).join('');
+        }
+
+        if (skillsEl) {
+          skillsEl.innerHTML = skills.map((skill: string) => `<span class="modal-skill-tag">${skill}</span>`).join('');
+        }
+
+        if (colleaguesEl) {
+          colleaguesEl.innerHTML = colleagues.map((col: string) => `<div class="modal-colleague-item">${col}</div>`).join('');
+        }
+
+        modal!.classList.add('open');
+        modal!.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+
+        // Play click chime!
+        // @ts-ignore
+        if (window.playSynthSound) {
+          // @ts-ignore
+          window.playSynthSound('click');
+        }
+      }
+
+      function closeModal() {
+        modal!.classList.remove('open');
+        modal!.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+
+        // Play hover pop sound!
+        // @ts-ignore
+        if (window.playSynthSound) {
+          // @ts-ignore
+          window.playSynthSound('hover');
+        }
+      }
+
+      cards.forEach(card => {
+        card.addEventListener('click', () => openModal(card));
+      });
+
+      closeBtn.addEventListener('click', closeModal);
+      backdrop?.addEventListener('click', closeModal);
+
+      // Escape key close
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape' && modal!.classList.contains('open')) {
+          closeModal();
+        }
+      };
+      window.addEventListener('keydown', handleKeyDown);
+    }
+
+    function initProficiencyChart() {
+      const chart = document.getElementById('proficiency-chart');
+      if (!chart) return;
+
+      const bars = chart.querySelectorAll('.chart-bar');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            bars.forEach(bar => {
+              const pct = bar.getAttribute('data-pct');
+              (bar as HTMLElement).style.width = pct + '%';
+            });
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+
+      observer.observe(chart);
+    }
+
     // Run on load
     initTimeline();
+    initMilestonePopups();
+    initProficiencyChart();
 
     // Run after view transitions
-    document.addEventListener('astro:after-swap', initTimeline);
+    document.addEventListener('astro:after-swap', () => {
+      initTimeline();
+      initMilestonePopups();
+      initProficiencyChart();
+    });
   </script>
 </BaseLayout>
 
-<style>
+  <style>
+    /* Proficiency Chart Styles */
+    .proficiency-chart {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .chart-heading {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: var(--color-text);
+    }
+
+    .chart-bars {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .chart-row {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .chart-label {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+    }
+
+    .chart-bar-track {
+      background: var(--color-bg-alt);
+      border: 1px solid var(--color-border);
+      height: 14px;
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .chart-bar {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+      border-radius: 999px;
+      transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+
+    .chart-bar.bar-backend {
+      background: linear-gradient(90deg, var(--color-accent), #f38ba8);
+    }
+
+    .chart-bar.bar-cloud {
+      background: linear-gradient(90deg, #f38ba8, #fab387);
+    }
+
+    .chart-pct {
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      color: var(--color-text);
+      font-weight: 700;
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      line-height: 1;
+    }
+
+    @media (max-width: 600px) {
+      .chart-row {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+      }
+    }
+
   .about-hero {
     padding-top: 8rem;
     padding-bottom: 2rem;
@@ -992,6 +1246,218 @@ const {
     
     .testimonials-cta {
       padding: 2rem 1.25rem;
+    }
+  }
+
+  /* Premium Glassmorphic Modal */
+  .milestone-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .milestone-modal.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .modal-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(10, 10, 12, 0.6);
+    backdrop-filter: blur(12px);
+    transition: opacity 0.4s ease;
+  }
+
+  .modal-wrapper {
+    position: relative;
+    width: 90%;
+    max-width: 650px;
+    max-height: 85vh;
+    z-index: 1001;
+    transform: scale(0.9) translateY(20px);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+  }
+
+  .milestone-modal.open .modal-wrapper {
+    transform: scale(1) translateY(0);
+  }
+
+  .modal-container {
+    width: 100%;
+    background: rgba(23, 23, 27, 0.85); /* Premium Dark Glass */
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 212, 255, 0.15);
+    overflow-y: auto;
+    padding: 2.5rem;
+    position: relative;
+  }
+
+  /* Light Theme support: if theme is light, make background lighter */
+  :global([data-theme="light"]) .modal-container {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(0, 0, 0, 0.08);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 40px rgba(0, 212, 255, 0.08);
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--color-text-muted);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .modal-close:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #ffffff;
+    transform: rotate(90deg);
+  }
+
+  .modal-header {
+    margin-bottom: 2rem;
+  }
+
+  .modal-meta-period {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+
+  .modal-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--color-text);
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .modal-company {
+    font-size: 1.1rem;
+    color: var(--color-text-muted);
+    font-weight: 500;
+    margin: 0;
+  }
+
+  .modal-section {
+    margin-bottom: 2rem;
+  }
+
+  .modal-section-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--color-text-muted);
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 0.5rem;
+  }
+
+  .modal-accomplishments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0;
+  }
+
+  .modal-accomplishments-list li {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    position: relative;
+    padding-left: 1.5rem;
+    list-style: none;
+    margin-bottom: 0;
+    text-align: left;
+  }
+
+  .modal-accomplishments-list li::before {
+    content: '✦';
+    position: absolute;
+    left: 0;
+    color: var(--color-primary);
+    font-size: 0.8rem;
+    top: 2px;
+  }
+
+  .modal-row-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 2rem;
+  }
+
+  .modal-skills-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .modal-skill-tag {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.3rem 0.8rem;
+    border-radius: var(--radius);
+    background: rgba(0, 212, 255, 0.06);
+    border: 1px solid rgba(0, 212, 255, 0.1);
+    color: var(--color-primary);
+    font-family: var(--font-mono);
+  }
+
+  .modal-colleagues-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .modal-colleague-item {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-align: left;
+  }
+
+  .modal-colleague-item::before {
+    content: '•';
+    color: var(--color-primary);
+    font-weight: 800;
+  }
+
+  @media (max-width: 600px) {
+    .modal-row-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    
+    .modal-container {
+      padding: 1.75rem;
     }
   }
 </style>

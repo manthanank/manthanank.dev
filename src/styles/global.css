@@ -37,6 +37,74 @@ html[data-theme="dark"] {
   --color-bg-rgb: 15, 23, 42;
 }
 
+/* Catppuccin Theme */
+html[data-theme="catppuccin"] {
+  --color-bg: #24273a;
+  --color-bg-alt: #1e2030;
+  --color-bg-card: #181926;
+  --color-text: #cad3f5;
+  --color-text-muted: #8087a2;
+  --color-border: #36394f;
+  --color-header-bg: rgba(36, 39, 58, 0.85);
+  --color-bg-rgb: 36, 39, 58;
+  --color-primary: #8aadf4;
+  --color-accent: #c6a0f6;
+  --color-accent-light: #b7bdf8;
+  --color-gradient-start: #8aadf4;
+  --color-gradient-end: #c6a0f6;
+}
+
+/* Tokyo Night Theme */
+html[data-theme="tokyonight"] {
+  --color-bg: #1a1b26;
+  --color-bg-alt: #16161e;
+  --color-bg-card: #1f2335;
+  --color-text: #a9b1d6;
+  --color-text-muted: #787c99;
+  --color-border: #292e42;
+  --color-header-bg: rgba(26, 27, 38, 0.85);
+  --color-bg-rgb: 26, 27, 38;
+  --color-primary: #7aa2f7;
+  --color-accent: #bb9af7;
+  --color-accent-light: #73daca;
+  --color-gradient-start: #7aa2f7;
+  --color-gradient-end: #bb9af7;
+}
+
+/* Gruvbox Theme */
+html[data-theme="gruvbox"] {
+  --color-bg: #282828;
+  --color-bg-alt: #1d2021;
+  --color-bg-card: #32302f;
+  --color-text: #ebdbb2;
+  --color-text-muted: #a89984;
+  --color-border: #3c3836;
+  --color-header-bg: rgba(40, 40, 40, 0.85);
+  --color-bg-rgb: 40, 40, 40;
+  --color-primary: #fe8019;
+  --color-accent: #d3869b;
+  --color-accent-light: #fabd2f;
+  --color-gradient-start: #fe8019;
+  --color-gradient-end: #fabd2f;
+}
+
+/* Nord Theme */
+html[data-theme="nord"] {
+  --color-bg: #2e3440;
+  --color-bg-alt: #242933;
+  --color-bg-card: #3b4252;
+  --color-text: #d8dee9;
+  --color-text-muted: #4c566a;
+  --color-border: #434c5e;
+  --color-header-bg: rgba(46, 52, 64, 0.85);
+  --color-bg-rgb: 46, 52, 64;
+  --color-primary: #88c0d0;
+  --color-accent: #b48ead;
+  --color-accent-light: #8fbcbb;
+  --color-gradient-start: #88c0d0;
+  --color-gradient-end: #b48ead;
+}
+
 *,
 *::before,
 *::after {

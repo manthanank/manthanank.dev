@@ -1,0 +1,121 @@
+---
+---
+<button id="sound-toggle" class="sound-toggle" aria-label="Toggle sound effects">
+  <svg class="sound-on-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+  </svg>
+  <svg class="sound-off-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+    <line x1="23" y1="9" x2="17" y2="15"></line>
+    <line x1="17" y1="9" x2="23" y2="15"></line>
+  </svg>
+</button>
+
+<script>
+  function setupSound() {
+    const toggle = document.getElementById('sound-toggle');
+    
+    const getSoundState = () => {
+      if (typeof localStorage !== 'undefined') {
+        return localStorage.getItem('sound-enabled') || 'disabled';
+      }
+      return 'disabled'; // Default is disabled
+    };
+
+    const setSoundState = (state: string) => {
+      document.documentElement.setAttribute('data-sound', state);
+      localStorage.setItem('sound-enabled', state);
+      
+      if (toggle) {
+        toggle.setAttribute('aria-label', `Sound: ${state}. Click to toggle.`);
+        toggle.setAttribute('title', `Sound Effects: ${state}`);
+      }
+    };
+
+    // Initial check
+    setSoundState(getSoundState());
+
+    toggle?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const current = document.documentElement.getAttribute('data-sound') || 'disabled';
+      const newState = current === 'enabled' ? 'disabled' : 'enabled';
+      setSoundState(newState);
+
+      // Play a quick test sound if enabled
+      if (newState === 'enabled') {
+        try {
+          const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+          
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.1);
+        } catch(err) {}
+      }
+    });
+  }
+
+  // Setup on load
+  setupSound();
+
+  // Setup on Astro swap
+  document.addEventListener('astro:after-swap', setupSound);
+</script>
+
+<style>
+  .sound-toggle {
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--color-text);
+    transition: all var(--transition);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .sound-toggle:hover {
+    background: var(--color-bg-alt);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    transform: scale(1.05);
+  }
+
+  .sound-on-icon, .sound-off-icon {
+    position: absolute;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+  }
+
+  :global(html[data-sound="enabled"]) .sound-on-icon {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  :global(html[data-sound="enabled"]) .sound-off-icon {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+
+  :global(html[data-sound="disabled"]) .sound-on-icon {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+
+  :global(html[data-sound="disabled"]) .sound-off-icon {
+    transform: translateY(0);
+    opacity: 1;
+  }
+</style>

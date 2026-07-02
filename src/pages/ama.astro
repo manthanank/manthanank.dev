@@ -1,0 +1,287 @@
+---
+export const prerender = false;
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { db, AMAQuestions, eq, desc } from 'astro:db';
+
+// Fetch answered questions for display
+const answeredQuestions = await db
+  .select()
+  .from(AMAQuestions)
+  .where(eq(AMAQuestions.answered, true))
+  .orderBy(desc(AMAQuestions.createdAt));
+---
+
+<BaseLayout title="AMA | Manthan Ankolekar" description="Ask Me Anything — submit a question and I'll answer it publicly.">
+  <section class="section ama-hero">
+    <div class="container">
+      <h1 class="section-title">Ask Me Anything</h1>
+      <p class="section-subtitle">
+        Have a question about Angular, TypeScript, career advice, or anything else?<br />
+        Submit it below — I answer publicly so everyone benefits.
+      </p>
+    </div>
+  </section>
+
+  <section class="container ama-section">
+    <!-- Submit form -->
+    <div class="ama-form-card card">
+      <h2 class="form-heading">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Submit a Question
+      </h2>
+      <form id="ama-form" class="form">
+        <div id="ama-error" class="error-banner" style="display:none;"></div>
+        <div id="ama-success" class="success-banner" style="display:none;">Your question has been submitted! I'll answer it soon.</div>
+
+        <div class="grid">
+          <div class="field">
+            <label for="ama-name">Your Name</label>
+            <input id="ama-name" name="name" type="text" required placeholder="John Doe" autocomplete="off" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="ama-question">Your Question</label>
+          <textarea id="ama-question" name="question" rows="4" required placeholder="Ask about Angular, career, open source, tools, anything really…"></textarea>
+        </div>
+
+        <button class="btn btn-primary btn-magnetic" type="submit" id="ama-submit">
+          Submit Question
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+        </button>
+      </form>
+    </div>
+
+    <!-- Answered Q&As -->
+    <div class="ama-answers">
+      <h2 class="answers-title">
+        Answered Questions
+        <span class="answers-badge">{answeredQuestions.length}</span>
+      </h2>
+
+      {answeredQuestions.length === 0 ? (
+        <div class="empty-state">
+          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+          <p>No answered questions yet. Be the first to ask!</p>
+        </div>
+      ) : (
+        <div class="qa-list">
+          {answeredQuestions.map(q => (
+            <div class="qa-card">
+              <div class="question-block">
+                <div class="q-icon">Q</div>
+                <div>
+                  <p class="q-text">{q.question}</p>
+                  <div class="q-meta">
+                    <span class="q-author">— {q.name}</span>
+                    <span class="q-date">{new Date(q.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                  </div>
+                </div>
+              </div>
+              {q.answer && (
+                <div class="answer-block">
+                  <div class="a-icon">A</div>
+                  <p class="a-text">{q.answer}</p>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  function initAMA() {
+    const form = document.getElementById('ama-form') as HTMLFormElement;
+    if (!form) return;
+
+    const nameInput = document.getElementById('ama-name') as HTMLInputElement;
+    const questionInput = document.getElementById('ama-question') as HTMLTextAreaElement;
+    const submitBtn = document.getElementById('ama-submit') as HTMLButtonElement;
+    const errBanner = document.getElementById('ama-error') as HTMLDivElement;
+    const succBanner = document.getElementById('ama-success') as HTMLDivElement;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errBanner.style.display = 'none';
+      succBanner.style.display = 'none';
+
+      const name = nameInput.value.trim();
+      const question = questionInput.value.trim();
+      if (!name || !question) {
+        errBanner.textContent = 'Both name and question are required.';
+        errBanner.style.display = 'block';
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting…';
+
+      try {
+        const res = await fetch('/api/ama', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, question })
+        });
+
+        if (res.ok) {
+          questionInput.value = '';
+          succBanner.style.display = 'block';
+          setTimeout(() => succBanner.style.display = 'none', 6000);
+        } else {
+          const data = await res.json();
+          errBanner.textContent = data.error || 'Failed to submit. Please try again.';
+          errBanner.style.display = 'block';
+        }
+      } catch {
+        errBanner.textContent = 'Network error. Please check your connection.';
+        errBanner.style.display = 'block';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Submit Question <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>';
+      }
+    });
+  }
+  initAMA();
+  document.addEventListener('astro:after-swap', initAMA);
+</script>
+
+<style>
+  .ama-hero { padding-top: 8rem; padding-bottom: 0; }
+  .ama-section { padding-bottom: 5rem; max-width: 800px; }
+
+  .card { background: var(--color-bg-card); border: 1px solid var(--color-border); border-radius: var(--radius); padding: 2rem; }
+
+  .ama-form-card { margin: 2rem 0 3rem; }
+
+  .form-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 1.5rem;
+  }
+
+  .form-heading svg { color: var(--color-primary); }
+
+  .form { display: flex; flex-direction: column; gap: 1.25rem; }
+
+  .grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+
+  .field { display: flex; flex-direction: column; gap: 0.4rem; }
+  .field label { font-size: 0.85rem; font-weight: 700; color: var(--color-text); }
+  .field input, .field textarea {
+    padding: 0.75rem 1rem;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    transition: border-color var(--transition);
+    outline: none;
+    resize: vertical;
+  }
+  .field input:focus, .field textarea:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(0,212,255,0.1); }
+
+  .error-banner { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.9rem; }
+  .success-banner { background: rgba(34,197,94,0.1); color: #22c55e; border: 1px solid rgba(34,197,94,0.2); padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.9rem; }
+
+  .ama-answers { margin-top: 2rem; }
+
+  .answers-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 2rem;
+  }
+
+  .answers-badge {
+    background: var(--color-primary);
+    color: #000;
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-family: var(--font-mono);
+  }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 3rem;
+    text-align: center;
+    color: var(--color-text-muted);
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius);
+  }
+  .empty-state svg { opacity: 0.4; }
+
+  .qa-list { display: flex; flex-direction: column; gap: 1.5rem; }
+
+  .qa-card {
+    background: var(--color-bg-alt);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    transition: border-color var(--transition);
+  }
+
+  .qa-card:hover { border-color: rgba(0,212,255,0.3); }
+
+  .question-block, .answer-block {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .answer-block {
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .q-icon, .a-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 800;
+    font-family: var(--font-mono);
+    flex-shrink: 0;
+  }
+
+  .q-icon { background: rgba(0,212,255,0.1); color: var(--color-primary); border: 1px solid rgba(0,212,255,0.2); }
+  .a-icon { background: rgba(124,58,237,0.1); color: var(--color-accent-light); border: 1px solid rgba(124,58,237,0.2); }
+
+  .q-text, .a-text { color: var(--color-text); line-height: 1.65; margin: 0; font-size: 0.95rem; }
+  .a-text { color: var(--color-text-muted); }
+
+  .q-meta {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+  }
+
+  .q-author { color: var(--color-primary); }
+
+  @media (max-width: 768px) {
+    .ama-hero { padding-top: 6rem; }
+    .card { padding: 1.25rem; }
+  }
+</style>

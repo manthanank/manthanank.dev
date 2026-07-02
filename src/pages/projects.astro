@@ -178,6 +178,10 @@ const allLikes = await db.select().from(PageLikes);
 
 const viewsMap = new Map(allViews.map(v => [v.slug, v.count]));
 const likesMap = new Map(allLikes.map(l => [l.slug, l.count]));
+
+// Extract unique tags across all projects
+const allProjectsCombined = [...pinnedProjects, ...resumeProjects, ...otherProjects];
+const allTags = Array.from(new Set(allProjectsCombined.flatMap(p => p.tags || []))).sort();
 ---
 
 <BaseLayout title="Projects | Manthan Ankolekar" description="A showcase of my recent work and open source contributions.">
@@ -185,6 +189,19 @@ const likesMap = new Map(allLikes.map(l => [l.slug, l.count]));
     <div class="container">
       <h1 class="section-title">Projects</h1>
       <p class="section-subtitle">A showcase of my recent work and open source contributions.</p>
+    </div>
+  </section>
+
+  <!-- Filter Buttons Section -->
+  <section class="container filter-section reveal">
+    <div class="filter-wrapper">
+      <span class="filter-label">Filter Tech:</span>
+      <div class="filter-tags" id="filter-tags">
+        <button class="filter-tag-btn active" data-filter="all">All</button>
+        {allTags.map(tag => (
+          <button class="filter-tag-btn" data-filter={tag.toLowerCase()}>{tag}</button>
+        ))}
+      </div>
     </div>
   </section>
 
@@ -196,11 +213,13 @@ const likesMap = new Map(allLikes.map(l => [l.slug, l.count]));
     </h2>
     <div class="projects-grid pinned-grid">
       {pinnedProjects.map((project) => (
-        <ProjectCard 
-          {...project} 
-          views={(project as any).slug ? viewsMap.get((project as any).slug) : undefined}
-          likes={(project as any).slug ? likesMap.get((project as any).slug) : undefined}
-        />
+        <div class="project-card-item" data-tags={(project.tags || []).map((t: string) => t.toLowerCase()).join(',')}>
+          <ProjectCard 
+            {...project} 
+            views={(project as any).slug ? viewsMap.get((project as any).slug) : undefined}
+            likes={(project as any).slug ? likesMap.get((project as any).slug) : undefined}
+          />
+        </div>
       ))}
     </div>
   </section>
@@ -213,11 +232,13 @@ const likesMap = new Map(allLikes.map(l => [l.slug, l.count]));
     </h2>
     <div class="projects-grid">
       {resumeProjects.map((project) => (
-        <ProjectCard 
-          {...project} 
-          views={(project as any).slug ? viewsMap.get((project as any).slug) : undefined}
-          likes={(project as any).slug ? likesMap.get((project as any).slug) : undefined}
-        />
+        <div class="project-card-item" data-tags={(project.tags || []).map(t => t.toLowerCase()).join(',')}>
+          <ProjectCard 
+            {...project} 
+            views={(project as any).slug ? viewsMap.get((project as any).slug) : undefined}
+            likes={(project as any).slug ? likesMap.get((project as any).slug) : undefined}
+          />
+        </div>
       ))}
     </div>
   </section>
@@ -229,11 +250,13 @@ const likesMap = new Map(allLikes.map(l => [l.slug, l.count]));
     </h2>
     <div class="projects-grid">
       {otherProjects.map((project) => (
-        <ProjectCard 
-          {...project} 
-          views={project.slug ? viewsMap.get(project.slug) : undefined}
-          likes={project.slug ? likesMap.get(project.slug) : undefined}
-        />
+        <div class="project-card-item" data-tags={(project.tags || []).map((t: string) => t.toLowerCase()).join(',')}>
+          <ProjectCard 
+            {...project} 
+            views={project.slug ? viewsMap.get(project.slug) : undefined}
+            likes={project.slug ? likesMap.get(project.slug) : undefined}
+          />
+        </div>
       ))}
     </div>
 
@@ -247,10 +270,123 @@ const likesMap = new Map(allLikes.map(l => [l.slug, l.count]));
   </section>
 </BaseLayout>
 
+<script>
+  function initProjectFilters() {
+    const buttons = document.querySelectorAll('.filter-tag-btn');
+    const cards = document.querySelectorAll('.project-card-item');
+
+    if (buttons.length === 0 || cards.length === 0) return;
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        buttons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const filter = btn.getAttribute('data-filter') || 'all';
+
+        cards.forEach((card: any) => {
+          const tags = card.getAttribute('data-tags') || '';
+          const tagList = tags.split(',');
+
+          if (filter === 'all' || tagList.includes(filter)) {
+            card.style.display = 'block';
+            requestAnimationFrame(() => {
+              card.style.opacity = '1';
+              card.style.transform = 'scale(1)';
+              card.style.transition = 'opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+            });
+          } else {
+            card.style.opacity = '0';
+            card.style.transform = 'scale(0.95)';
+            card.style.transition = 'opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+            setTimeout(() => {
+              // Confirm selected filter has not changed during timer
+              const activeBtn = document.querySelector('.filter-tag-btn.active');
+              const activeFilter = activeBtn ? activeBtn.getAttribute('data-filter') : 'all';
+              if (activeFilter === filter) {
+                card.style.display = 'none';
+              }
+            }, 400);
+          }
+        });
+      });
+    });
+  }
+
+  // Initial load
+  initProjectFilters();
+
+  // Astro page transitions support
+  document.addEventListener('astro:after-swap', initProjectFilters);
+</script>
+
 <style>
   .projects-hero {
     padding-top: 8rem;
     padding-bottom: 0;
+  }
+
+  /* Filters */
+  .filter-section {
+    padding-top: 2rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .filter-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    padding: 1rem 1.5rem;
+    border-radius: var(--radius);
+    overflow-x: auto;
+  }
+
+  .filter-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+
+  .filter-tags {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .filter-tags::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filter-tag-btn {
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 0.4rem 0.9rem;
+    border-radius: 99px;
+    background: var(--color-bg-alt);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    cursor: pointer;
+    transition: all var(--transition);
+    white-space: nowrap;
+  }
+
+  .filter-tag-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+
+  .filter-tag-btn.active {
+    background: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
+    box-shadow: 0 4px 12px rgba(0, 212, 255, 0.2);
   }
 
   .pinned-section {

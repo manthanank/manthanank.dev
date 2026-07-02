@@ -13,6 +13,18 @@ export async function getStaticPaths() {
 
 const { snippet } = Astro.props;
 const { Content } = await render(snippet);
+
+// Extract code blocks from snippet body
+const markdownBody = snippet.body || '';
+const jsCodeMatch = markdownBody.match(/```(?:javascript|js)\b([\s\S]*?)```/);
+const cssCodeMatch = markdownBody.match(/```css\b([\s\S]*?)```/);
+const htmlCodeMatch = markdownBody.match(/```html\b([\s\S]*?)```/);
+
+const jsCode = jsCodeMatch ? jsCodeMatch[1].trim() : '';
+const cssCode = cssCodeMatch ? cssCodeMatch[1].trim() : '';
+const htmlCode = htmlCodeMatch ? htmlCodeMatch[1].trim() : '';
+
+const hasSandbox = jsCode || cssCode || htmlCode;
 ---
 
 <BaseLayout title={`${snippet.data.title} | Snippets`} description={snippet.data.description}>
@@ -32,11 +44,205 @@ const { Content } = await render(snippet);
   </section>
 
   <article class="container snippet-content">
-    <div class="prose snippet-prose">
-      <Content />
-    </div>
+    {hasSandbox ? (
+      <div class="tabs-container">
+        <div class="tab-buttons">
+          <button class="tab-btn active" data-tab="explanation">Explanation</button>
+          <button class="tab-btn" data-tab="playground">Interactive Playground</button>
+        </div>
+
+        <div class="tab-panels">
+          <div class="tab-panel active" id="tab-explanation">
+            <div class="prose snippet-prose">
+              <Content />
+            </div>
+          </div>
+
+          <div class="tab-panel" id="tab-playground">
+            <div class="playground-layout">
+              <div class="editors">
+                {htmlCode && (
+                  <div class="editor-section">
+                    <label for="html-editor">HTML</label>
+                    <textarea id="html-editor" rows="5" class="code-editor" spellcheck="false">{htmlCode}</textarea>
+                  </div>
+                )}
+                {cssCode && (
+                  <div class="editor-section">
+                    <label for="css-editor">CSS</label>
+                    <textarea id="css-editor" rows="6" class="code-editor" spellcheck="false">{cssCode}</textarea>
+                  </div>
+                )}
+                {jsCode && (
+                  <div class="editor-section">
+                    <label for="js-editor">JavaScript</label>
+                    <textarea id="js-editor" rows="8" class="code-editor" spellcheck="false">{jsCode}</textarea>
+                  </div>
+                )}
+                <button class="btn btn-primary btn-magnetic" id="btn-run-code">
+                  Run Code
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                </button>
+              </div>
+
+              <div class="preview-panel">
+                <label>Live Preview</label>
+                <div class="iframe-wrapper">
+                  <iframe id="preview-iframe" title="Interactive Snippet Preview" sandbox="allow-scripts allow-modals"></iframe>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    ) : (
+      <div class="prose snippet-prose">
+        <Content />
+      </div>
+    )}
   </article>
 </BaseLayout>
+
+<script is:inline define:vars={{ jsCode, cssCode, htmlCode, hasSandbox }}>
+  if (hasSandbox) {
+    function initPlayground() {
+      const tabBtns = document.querySelectorAll('.tab-btn');
+      const tabPanels = document.querySelectorAll('.tab-panel');
+      const runBtn = document.getElementById('btn-run-code');
+      const iframe = document.getElementById('preview-iframe');
+
+      const htmlEditor = document.getElementById('html-editor');
+      const cssEditor = document.getElementById('css-editor');
+      const jsEditor = document.getElementById('js-editor');
+
+      if (!iframe) return;
+
+      // Handle tabs
+      tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          tabBtns.forEach(b => b.classList.remove('active'));
+          tabPanels.forEach(p => p.classList.remove('active'));
+
+          btn.classList.add('active');
+          const target = btn.getAttribute('data-tab');
+          const panel = document.getElementById(`tab-${target}`);
+          if (panel) panel.classList.add('active');
+
+          if (target === 'playground') {
+            updatePreview();
+          }
+        });
+      });
+
+      function updatePreview() {
+        const html = htmlEditor ? htmlEditor.value : `
+<div class="playground-demo">
+  <h3>Interactive Demo</h3>
+  <p>Click the button below to execute the snippet.</p>
+  <button id="run-btn" class="demo-btn">Execute Function</button>
+  <div id="output-log" class="output-log">Logs will appear here...</div>
+</div>
+        `;
+        const css = cssEditor ? cssEditor.value : `
+body {
+  font-family: system-ui, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  background: #0f172a;
+  color: #f1f5f9;
+}
+.playground-demo {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  max-width: 320px;
+}
+.demo-btn {
+  background: linear-gradient(135deg, #00d4ff, #7c3aed);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+.output-log {
+  margin-top: 1.25rem;
+  font-family: monospace;
+  font-size: 0.85rem;
+  background: #0f172a;
+  padding: 0.5rem;
+  border-radius: 6px;
+  color: #a6e3a1;
+  text-align: left;
+}
+        `;
+        const js = jsEditor ? jsEditor.value : '';
+
+        const embeddedJs = `
+const logDiv = document.getElementById('output-log');
+const originalLog = console.log;
+console.log = function(...args) {
+  originalLog.apply(console, args);
+  if (logDiv) {
+    logDiv.textContent = args.join(' ');
+    logDiv.style.color = '#a6e3a1';
+  }
+};
+const originalError = console.error;
+console.error = function(...args) {
+  originalError.apply(console, args);
+  if (logDiv) {
+    logDiv.textContent = 'Error: ' + args.join(' ');
+    logDiv.style.color = '#f38ba8';
+  }
+};
+
+${js}
+
+const runBtn = document.getElementById('run-btn');
+if (runBtn) {
+  runBtn.addEventListener('click', () => {
+    if (typeof copyToClipboard === 'function') {
+      copyToClipboard('Hello from Manthan\\'s Playground!');
+    } else {
+      console.log('Function executed successfully!');
+    }
+  });
+}
+        `;
+
+        const srcDoc = `
+<!doctype html>
+<html>
+<head>
+  <style>${css}</style>
+</head>
+<body>
+  ${html}
+  <script>${embeddedJs}${'<'}/script>
+</body>
+</html>
+        `;
+
+        iframe.srcdoc = srcDoc;
+      }
+
+      if (runBtn) {
+        runBtn.addEventListener('click', updatePreview);
+      }
+    }
+
+    initPlayground();
+    document.addEventListener('astro:after-swap', initPlayground);
+  }
+</script>
 
 <style>
   .snippet-hero {
@@ -98,9 +304,134 @@ const { Content } = await render(snippet);
   }
 
   .snippet-content {
-    max-width: 800px;
+    max-width: 900px;
     margin: 0 auto;
     padding: 4rem 1.5rem;
+  }
+
+  /* Tabs styling */
+  .tabs-container {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .tab-buttons {
+    display: flex;
+    background: var(--color-bg-alt);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .tab-btn {
+    flex: 1;
+    padding: 1rem;
+    font-family: inherit;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all var(--transition);
+  }
+
+  .tab-btn:hover {
+    color: var(--color-primary);
+  }
+
+  .tab-btn.active {
+    color: var(--color-primary);
+    background: var(--color-bg-card);
+    border-bottom-color: var(--color-primary);
+  }
+
+  .tab-panels {
+    padding: 2rem;
+  }
+
+  .tab-panel {
+    display: none;
+  }
+
+  .tab-panel.active {
+    display: block;
+  }
+
+  /* Playground Layout */
+  .playground-layout {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 2rem;
+    align-items: stretch;
+  }
+
+  .editors {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .editor-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .editor-section label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-primary);
+  }
+
+  .code-editor {
+    width: 100%;
+    background: #1e1e2e;
+    color: #cdd6f4;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    padding: 1rem;
+    resize: vertical;
+    outline: none;
+    line-height: 1.5;
+  }
+
+  .code-editor:focus {
+    border-color: var(--color-primary);
+  }
+
+  .preview-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-height: 400px;
+  }
+
+  .preview-panel label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-accent-light);
+  }
+
+  .iframe-wrapper {
+    flex: 1;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: #0f172a;
+  }
+
+  #preview-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: #0f172a;
   }
 
   /* Basic prose styling since we don't have Tailwind typography */
@@ -128,5 +459,15 @@ const { Content } = await render(snippet);
   .snippet-prose :global(code) {
     font-family: var(--font-mono);
     font-size: 0.9em;
+  }
+
+  @media (max-width: 768px) {
+    .playground-layout {
+      grid-template-columns: 1fr;
+    }
+    
+    .tab-panels {
+      padding: 1.25rem;
+    }
   }
 </style>

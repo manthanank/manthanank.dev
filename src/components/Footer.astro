@@ -28,9 +28,19 @@ const sitemap = [
     ]
   },
   {
+    title: 'Discover',
+    links: [
+      { href: '/packages', label: 'NPM Packages' },
+      { href: '/timeline', label: 'Timeline' },
+      { href: '/bookmarks', label: 'Bookmarks' },
+      { href: '/ama', label: 'Ask Me Anything' },
+    ]
+  },
+  {
     title: 'Personal',
     links: [
       { href: '/guestbook', label: 'Guestbook' },
+      { href: '/dashboard', label: 'Dashboard' },
       { href: '/uses', label: 'Uses (Gear)' },
       { href: '/now', label: 'Now' },
     ]
@@ -175,7 +185,7 @@ const sitemap = [
 
   .footer-sitemap {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 2rem;
   }
 

@@ -1,8 +1,9 @@
-export const prerender = true;
+export const prerender = false;
 import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
+import { db, PageViews, PageLikes, eq } from 'astro:db';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
@@ -29,9 +30,27 @@ export async function getStaticPaths() {
   ];
 }
 
-export const GET: APIRoute = async ({ props }) => {
+export const GET: APIRoute = async ({ params, props }) => {
+  const { id } = params;
   const { title, description } = props as { title: string; description: string };
   const projectRoot = process.cwd();
+  
+  let views = 0;
+  let likes = 0;
+  if (id) {
+    try {
+      const viewsRes = await db.select().from(PageViews).where(eq(PageViews.slug, id));
+      const likesRes = await db.select().from(PageLikes).where(eq(PageLikes.slug, id));
+      if (viewsRes.length > 0) views = viewsRes[0].count;
+      if (likesRes.length > 0) likes = likesRes[0].count;
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  const isArticle = !['home', 'about', 'projects', 'blog', 'contact', 'dashboard', 'chat', 'admin', 'guestbook'].includes(id || '');
+  const prefix = isArticle ? 'Technical Article' : 'Portfolio Page';
+  const metaText = `${prefix} • ${views} Views • ${likes} Likes`;
   
   try {
     // Read font
@@ -120,7 +139,7 @@ export const GET: APIRoute = async ({ props }) => {
                               textTransform: 'uppercase',
                               letterSpacing: '2px',
                             },
-                            children: 'Technical Article',
+                            children: metaText,
                           }
                         }
                       ]

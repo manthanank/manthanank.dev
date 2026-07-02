@@ -21,6 +21,8 @@
   function setupTheme() {
     const themeToggle = document.getElementById('theme-toggle');
     
+    const themes = ['light', 'dark', 'catppuccin', 'tokyonight', 'gruvbox', 'nord'];
+
     const getTheme = () => {
       if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
         return localStorage.getItem('theme');
@@ -31,14 +33,22 @@
     const setTheme = (theme: string) => {
       document.documentElement.setAttribute('data-theme', theme);
       localStorage.setItem('theme', theme);
+      
+      // Update button aria-label
+      if (themeToggle) {
+        themeToggle.setAttribute('aria-label', `Theme: ${theme}. Click to switch.`);
+        themeToggle.setAttribute('title', `Active Theme: ${theme}`);
+      }
     };
 
     // Initial check
     setTheme(getTheme() ?? 'dark');
 
     themeToggle?.addEventListener('click', () => {
-      const currentTheme = document.documentElement.getAttribute('data-theme');
-      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+      const currentIndex = themes.indexOf(currentTheme);
+      const nextIndex = (currentIndex + 1) % themes.length;
+      const newTheme = themes[nextIndex];
       setTheme(newTheme);
     });
   }
@@ -79,12 +89,21 @@
     transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
   }
 
-  :global(html[data-theme="dark"]) .sun-icon {
+  /* All Dark-leaning themes hide Sun and show Moon */
+  :global(html[data-theme="dark"]) .sun-icon,
+  :global(html[data-theme="catppuccin"]) .sun-icon,
+  :global(html[data-theme="tokyonight"]) .sun-icon,
+  :global(html[data-theme="gruvbox"]) .sun-icon,
+  :global(html[data-theme="nord"]) .sun-icon {
     transform: translateY(100%);
     opacity: 0;
   }
 
-  :global(html[data-theme="dark"]) .moon-icon {
+  :global(html[data-theme="dark"]) .moon-icon,
+  :global(html[data-theme="catppuccin"]) .moon-icon,
+  :global(html[data-theme="tokyonight"]) .moon-icon,
+  :global(html[data-theme="gruvbox"]) .moon-icon,
+  :global(html[data-theme="nord"]) .moon-icon {
     transform: translateY(0);
     opacity: 1;
   }

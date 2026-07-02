@@ -4,23 +4,38 @@ interface Props {
   company: string;
   period: string;
   description: string[];
+  skills?: string[];
+  colleagues?: string[];
 }
 
-const { title, company, period, description } = Astro.props;
+const { title, company, period, description, skills = [], colleagues = [] } = Astro.props;
 ---
 
 <div class="experience-item">
   <div class="timeline-dot"></div>
-  <div class="experience-content">
+  <div 
+    class="experience-content"
+    data-milestone
+    data-title={title}
+    data-company={company}
+    data-period={period}
+    data-description={JSON.stringify(description)}
+    data-skills={JSON.stringify(skills)}
+    data-colleagues={JSON.stringify(colleagues)}
+  >
     <div class="experience-header">
       <h3 class="experience-title">{title}</h3>
       <span class="experience-period">{period}</span>
     </div>
-    <p class="experience-company">{company}</p>
+    <div class="experience-company-row">
+      <p class="experience-company">{company}</p>
+      <span class="experience-more-badge">View Milestone ✦</span>
+    </div>
     <ul class="experience-list">
-      {description.map((item) => (
+      {description.slice(0, 2).map((item) => (
         <li>{item}</li>
       ))}
+      {description.length > 2 && <li class="more-indicator">Click card to read more accomplishments...</li>}
     </ul>
   </div>
 </div>
@@ -61,16 +76,24 @@ const { title, company, period, description } = Astro.props;
     background: var(--color-bg-alt);
     border: 1px solid var(--color-border);
     border-radius: var(--radius);
-    transition: all 0.6s cubic-bezier(0.5, 0, 0, 1);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     transform: translateY(20px);
     opacity: 0;
+    cursor: pointer;
   }
 
   .experience-item.active .experience-content {
     transform: translateY(0);
     opacity: 1;
-    border-color: rgba(0, 212, 255, 0.3);
-    background: rgba(0, 212, 255, 0.03);
+    border-color: rgba(0, 212, 255, 0.2);
+    background: rgba(0, 212, 255, 0.02);
+  }
+
+  .experience-content:hover {
+    border-color: var(--color-primary) !important;
+    background: rgba(0, 212, 255, 0.05) !important;
+    transform: translateY(-4px) scale(1.01) !important;
+    box-shadow: 0 10px 30px rgba(0, 212, 255, 0.1);
   }
 
   .experience-header {
@@ -97,10 +120,33 @@ const { title, company, period, description } = Astro.props;
     border-radius: 20px;
   }
 
+  .experience-company-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+
   .experience-company {
     color: var(--color-text-muted);
-    margin-bottom: 0.75rem;
     font-weight: 500;
+    margin: 0;
+  }
+
+  .experience-more-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    background: rgba(0, 212, 255, 0.1);
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    opacity: 0.7;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .experience-content:hover .experience-more-badge {
+    opacity: 1;
+    transform: scale(1.05);
   }
 
   .experience-list {
@@ -111,9 +157,23 @@ const { title, company, period, description } = Astro.props;
     gap: 0.4rem;
   }
 
+  .experience-list li {
+    position: relative;
+    padding-left: 1.25rem;
+    list-style: none;
+  }
+
   .experience-list li::before {
     content: '▹';
+    position: absolute;
+    left: 0;
     color: var(--color-primary);
-    margin-right: 0.5rem;
+  }
+
+  .more-indicator {
+    color: var(--color-primary) !important;
+    font-style: italic;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
   }
 </style>

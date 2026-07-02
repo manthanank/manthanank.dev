@@ -32,11 +32,35 @@ const Guestbook = defineTable({
   }
 });
 
+const Comments = defineTable({
+  columns: {
+    id: column.text({ primaryKey: true }),
+    postSlug: column.text(),
+    name: column.text(),
+    message: column.text(),
+    createdAt: column.date({ default: new Date() }),
+  }
+});
+
+const AMAQuestions = defineTable({
+  columns: {
+    id: column.text({ primaryKey: true }),
+    name: column.text(),
+    question: column.text(),
+    answer: column.text({ optional: true }),
+    answered: column.boolean({ default: false }),
+    createdAt: column.date({ default: new Date() }),
+  }
+});
+
 export default defineDb({
   tables: {
     PageViews,
     PageLikes,
     Subscribers,
-    Guestbook
+    Guestbook,
+    Comments,
+    AMAQuestions
   }
 });
+

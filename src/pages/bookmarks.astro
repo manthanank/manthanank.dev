@@ -1,0 +1,258 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const bookmarks = [
+  {
+    category: 'Developer Tools',
+    icon: '🛠️',
+    items: [
+      { name: 'VS Code', url: 'https://code.visualstudio.com', desc: 'My primary code editor — fast, extensible, and free.' },
+      { name: 'GitHub Copilot', url: 'https://github.com/features/copilot', desc: 'AI pair programmer that makes me significantly faster.' },
+      { name: 'Postman', url: 'https://postman.com', desc: 'API testing and documentation. Indispensable for backend work.' },
+      { name: 'Figma', url: 'https://figma.com', desc: 'Design and prototyping tool I use for UI mockups.' },
+      { name: 'TablePlus', url: 'https://tableplus.com', desc: 'Beautiful database GUI for MySQL, PostgreSQL, and MongoDB.' },
+      { name: 'Warp Terminal', url: 'https://www.warp.dev', desc: 'A blazingly fast terminal with AI command suggestions.' },
+    ]
+  },
+  {
+    category: 'Learning Resources',
+    icon: '📚',
+    items: [
+      { name: 'Angular Docs', url: 'https://angular.dev', desc: 'The official Angular documentation — always my first stop.' },
+      { name: 'RxJS Docs', url: 'https://rxjs.dev', desc: 'Comprehensive RxJS operator reference and guides.' },
+      { name: 'TypeScript Handbook', url: 'https://www.typescriptlang.org/docs/handbook/intro.html', desc: 'The definitive guide to TypeScript features.' },
+      { name: 'Node.js Docs', url: 'https://nodejs.org/docs/latest/api/', desc: 'Official Node.js API reference documentation.' },
+      { name: 'web.dev', url: 'https://web.dev', desc: "Google's resource for modern web development best practices." },
+      { name: 'Astro Docs', url: 'https://docs.astro.build', desc: 'Excellent documentation for the Astro framework used on this site.' },
+    ]
+  },
+  {
+    category: 'Blogs & Newsletters',
+    icon: '📰',
+    items: [
+      { name: 'ByteByteGo', url: 'https://blog.bytebytego.com', desc: 'System design explained with beautiful diagrams.' },
+      { name: 'Josh W. Comeau', url: 'https://www.joshwcomeau.com', desc: 'Exceptional blog on CSS, React, and web fundamentals.' },
+      { name: 'Kent C. Dodds Blog', url: 'https://kentcdodds.com/blog', desc: 'Testing, React, and professional development insights.' },
+      { name: 'Lee Robinson', url: 'https://leerob.io', desc: 'Next.js, Vercel, and developer experience topics.' },
+      { name: 'Dev.to Angular', url: 'https://dev.to/t/angular', desc: 'Community articles on Angular from practitioners.' },
+      { name: 'This Week in Angular', url: 'https://www.ninja-squad.com/blog', desc: 'Weekly roundup of Angular news and updates.' },
+    ]
+  },
+  {
+    category: 'VS Code Extensions',
+    icon: '🔌',
+    items: [
+      { name: 'Angular Language Service', url: 'https://marketplace.visualstudio.com/items?itemName=Angular.ng-template', desc: 'IntelliSense for Angular templates.' },
+      { name: 'ESLint', url: 'https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint', desc: 'Linting integrated directly in VS Code.' },
+      { name: 'Prettier', url: 'https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode', desc: 'Code formatting on save.' },
+      { name: 'GitLens', url: 'https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens', desc: 'Supercharges Git inside VS Code.' },
+      { name: 'Auto Rename Tag', url: 'https://marketplace.visualstudio.com/items?itemName=formulahendry.auto-rename-tag', desc: 'Auto-renames paired HTML/XML tags.' },
+      { name: 'Material Icon Theme', url: 'https://marketplace.visualstudio.com/items?itemName=PKief.material-icon-theme', desc: 'Beautiful file icons for your sidebar.' },
+    ]
+  },
+  {
+    category: 'Productivity',
+    icon: '⚡',
+    items: [
+      { name: 'Notion', url: 'https://notion.so', desc: 'My go-to for notes, planning, and knowledge management.' },
+      { name: 'Excalidraw', url: 'https://excalidraw.com', desc: 'Free, open-source virtual whiteboard for hand-drawn style diagrams.' },
+      { name: 'Carbon', url: 'https://carbon.now.sh', desc: 'Create beautiful screenshots of your code.' },
+      { name: 'Ray.so', url: 'https://ray.so', desc: 'Another beautiful tool for code screenshots with gradient backgrounds.' },
+      { name: 'Squoosh', url: 'https://squoosh.app', desc: 'Image compression in the browser — incredibly useful for performance.' },
+      { name: 'Cron.com', url: 'https://cron.com', desc: 'The best calendar app I have used. Clean and fast.' },
+    ]
+  },
+  {
+    category: 'References',
+    icon: '🔗',
+    items: [
+      { name: 'CSS-Tricks', url: 'https://css-tricks.com', desc: 'Timeless CSS reference and guides.' },
+      { name: 'MDN Web Docs', url: 'https://developer.mozilla.org', desc: 'The authoritative reference for HTML, CSS, and JavaScript.' },
+      { name: 'Can I Use', url: 'https://caniuse.com', desc: 'Browser compatibility tables for web technologies.' },
+      { name: 'Regex101', url: 'https://regex101.com', desc: 'Online regex builder and debugger with explanations.' },
+      { name: 'JWT.io', url: 'https://jwt.io', desc: 'Decode, verify, and generate JSON Web Tokens.' },
+      { name: 'JSON Formatter', url: 'https://jsonformatter.curiousconcept.com', desc: 'Validate and format JSON easily.' },
+    ]
+  },
+];
+
+const allCategories = bookmarks.map(b => b.category);
+---
+
+<BaseLayout title="Bookmarks | Manthan Ankolekar" description="Curated list of tools, resources, blogs, and extensions I use and recommend.">
+  <section class="section bookmarks-hero">
+    <div class="container">
+      <h1 class="section-title">Bookmarks</h1>
+      <p class="section-subtitle">Curated tools, resources, blogs, and extensions I use and recommend</p>
+    </div>
+  </section>
+
+  <section class="container bookmarks-section">
+    <!-- Category filter -->
+    <div class="bm-controls reveal">
+      <div class="bm-search-wrapper">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="bm-search" type="search" placeholder="Search bookmarks…" autocomplete="off" aria-label="Search bookmarks" />
+      </div>
+      <div class="bm-cat-filters">
+        <button class="bm-cat-btn active" data-cat="all">All</button>
+        {allCategories.map(cat => (
+          <button class="bm-cat-btn" data-cat={cat}>{cat}</button>
+        ))}
+      </div>
+    </div>
+
+    <div class="bookmarks-grid" id="bookmarks-grid">
+      {bookmarks.map((group) => (
+        <div class="bm-group reveal" data-category={group.category}>
+          <h2 class="bm-category-title">
+            <span class="bm-icon">{group.icon}</span>
+            {group.category}
+          </h2>
+          <div class="bm-items">
+            {group.items.map(item => (
+              <a href={item.url} target="_blank" rel="noopener noreferrer" class="bm-item">
+                <div class="bm-item-header">
+                  <span class="bm-item-name">{item.name}</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="bm-external"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+                </div>
+                <p class="bm-item-desc">{item.desc}</p>
+              </a>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  function initBookmarkFilter() {
+    const search = document.getElementById('bm-search') as HTMLInputElement;
+    const catBtns = document.querySelectorAll('.bm-cat-btn');
+    const groups = document.querySelectorAll('.bm-group') as NodeListOf<HTMLElement>;
+    if (!search) return;
+    let activecat = 'all', query = '';
+
+    function filter() {
+      groups.forEach(group => {
+        const cat = group.dataset.category || '';
+        const catMatch = activecat === 'all' || cat === activecat;
+        const items = group.querySelectorAll('.bm-item') as NodeListOf<HTMLElement>;
+        let itemsVisible = 0;
+
+        items.forEach(item => {
+          const name = (item.querySelector('.bm-item-name')?.textContent || '').toLowerCase();
+          const desc = (item.querySelector('.bm-item-desc')?.textContent || '').toLowerCase();
+          const searchMatch = !query || name.includes(query) || desc.includes(query);
+          item.style.display = (catMatch && searchMatch) ? '' : 'none';
+          if (catMatch && searchMatch) itemsVisible++;
+        });
+
+        group.style.display = (catMatch && itemsVisible > 0) ? '' : 'none';
+      });
+    }
+
+    search.addEventListener('input', () => { query = search.value.trim().toLowerCase(); filter(); });
+    catBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        catBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activecat = btn.getAttribute('data-cat') || 'all';
+        filter();
+      });
+    });
+  }
+  initBookmarkFilter();
+  document.addEventListener('astro:after-swap', initBookmarkFilter);
+</script>
+
+<style>
+  .bookmarks-hero { padding-top: 8rem; padding-bottom: 0; }
+  .bookmarks-section { padding-bottom: 5rem; }
+
+  .bm-controls { margin: 2rem 0; display: flex; flex-direction: column; gap: 1rem; }
+  .bm-search-wrapper { display: flex; align-items: center; gap: 0.75rem; background: var(--color-bg-card); border: 1px solid var(--color-border); border-radius: var(--radius); padding: 0.75rem 1.25rem; transition: border-color var(--transition); }
+  .bm-search-wrapper:focus-within { border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(0,212,255,0.08); }
+  .bm-search-wrapper svg { color: var(--color-text-muted); flex-shrink: 0; }
+  #bm-search { flex: 1; border: none; outline: none; background: none; color: var(--color-text); font-size: 1rem; font-family: var(--font-sans); }
+  #bm-search::placeholder { color: var(--color-text-muted); }
+  .bm-cat-filters { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .bm-cat-btn { font-size: 0.82rem; font-weight: 600; padding: 0.35rem 0.85rem; border-radius: 99px; background: var(--color-bg-alt); border: 1px solid var(--color-border); color: var(--color-text-muted); cursor: pointer; transition: all var(--transition); white-space: nowrap; font-family: inherit; }
+  .bm-cat-btn:hover { border-color: var(--color-primary); color: var(--color-primary); }
+  .bm-cat-btn.active { background: var(--color-primary); color: #000; border-color: var(--color-primary); }
+
+  .bookmarks-grid { display: flex; flex-direction: column; gap: 3rem; }
+
+  .bm-group {}
+
+  .bm-category-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .bm-icon { font-size: 1.4rem; }
+
+  .bm-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+    gap: 1rem;
+  }
+
+  .bm-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    text-decoration: none;
+    color: inherit;
+    transition: all var(--transition);
+  }
+
+  .bm-item:hover {
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 212, 255, 0.07);
+  }
+
+  .bm-item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .bm-item-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-text);
+    transition: color var(--transition);
+  }
+
+  .bm-item:hover .bm-item-name { color: var(--color-primary); }
+
+  .bm-external { color: var(--color-text-muted); opacity: 0; transition: opacity var(--transition); flex-shrink: 0; }
+  .bm-item:hover .bm-external { opacity: 1; }
+
+  .bm-item-desc {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    .bookmarks-hero { padding-top: 6rem; }
+    .bm-items { grid-template-columns: 1fr; }
+  }
+</style>

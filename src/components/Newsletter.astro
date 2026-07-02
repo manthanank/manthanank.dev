@@ -110,6 +110,8 @@
 </style>
 
 <script>
+  import confetti from 'canvas-confetti';
+
   function initNewsletter() {
     const form = document.getElementById('newsletter-form');
     const input = document.getElementById('email-input') as HTMLInputElement;
@@ -135,6 +137,11 @@
         });
         
         if (res.ok) {
+          confetti({
+            particleCount: 80,
+            spread: 50,
+            origin: { y: 0.8 }
+          });
           msg.textContent = "Thanks for subscribing! Check your inbox to confirm.";
           msg.className = 'newsletter-message success';
           input.value = '';

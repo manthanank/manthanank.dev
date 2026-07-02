@@ -1,6 +1,7 @@
 ---
 import ThemeToggle from './ThemeToggle.astro';
 import CommandPalette from './CommandPalette.astro';
+import SoundToggle from './SoundToggle.astro';
 
 const currentPath = Astro.url.pathname;
 
@@ -9,6 +10,7 @@ const navLinks = [
   { href: '/about', label: 'About' },
   { href: '/projects', label: 'Projects' },
   { href: '/blog', label: 'Blog' },
+  { href: '/dashboard', label: 'Dashboard' },
   { href: '/contact', label: 'Contact' },
 ];
 ---
@@ -40,6 +42,7 @@ const navLinks = [
       <div class="nav-actions">
         <CommandPalette />
         <ThemeToggle />
+        <SoundToggle />
         <button class="mobile-toggle" aria-label="Toggle navigation" id="mobile-toggle">
           <span class="bar"></span>
           <span class="bar"></span>

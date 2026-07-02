@@ -1,0 +1,344 @@
+---
+export const prerender = false;
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// NPM packages list
+const npmPackages = [
+  { name: '@manthanankolekar/ng-icons', description: 'A collection of custom icons for Angular applications.', keywords: ['angular', 'icons', 'svg'] },
+  { name: '@manthanankolekar/ng-loader', description: 'A lightweight and customizable loading spinner/loader component for Angular.', keywords: ['angular', 'loader', 'spinner', 'loading'] },
+  { name: '@manthanankolekar/ng-markdown', description: 'Angular library to parse and render Markdown directly in templates.', keywords: ['angular', 'markdown', 'parser', 'marked'] },
+  { name: '@manthanankolekar/ng-pagination', description: 'Custom pagination component for Angular with support for custom templates.', keywords: ['angular', 'pagination', 'paging'] },
+  { name: '@manthanankolekar/custom-directives', description: 'A collection of helpful custom Angular directives for daily tasks.', keywords: ['angular', 'directives', 'utility'] },
+  { name: 'learn-angular', description: 'Learn Angular from basic components to advanced signals.', keywords: ['angular', 'signals', 'typescript', 'tutorials'] },
+  { name: 'learn-rxjs', description: 'Learn RxJS with interactive code examples and visual explanations.', keywords: ['rxjs', 'observables', 'reactive', 'javascript'] },
+  { name: 'learn-mongodb', description: 'Learn MongoDB database operations and shell commands.', keywords: ['mongodb', 'database', 'nosql', 'backend'] },
+  { name: 'learn-javascript', description: 'Learn JavaScript from basic syntax to advanced promises.', keywords: ['javascript', 'async', 'promises', 'es6'] },
+  { name: 'learn-docker', description: 'Learn Docker containers and compose configuration.', keywords: ['docker', 'containers', 'devops', 'deployment'] },
+  { name: 'learn-nestjs', description: 'Learn NestJS server-side framework and architecture.', keywords: ['nestjs', 'typescript', 'node.js', 'backend'] },
+  { name: 'learn-mysql', description: 'Learn MySQL database operations, joins, and queries.', keywords: ['mysql', 'database', 'sql', 'backend'] },
+  { name: 'learn-html', description: 'Learn HTML structures and semantical layout tags.', keywords: ['html', 'markup', 'seo', 'accessibility'] },
+  { name: 'learn-css', description: 'Learn CSS layouts, flexbox, and grid.', keywords: ['css', 'layouts', 'flexbox', 'grid'] },
+  { name: 'learn-scss', description: 'Learn SCSS variables, mixins, nesting, and functions.', keywords: ['scss', 'sass', 'css', 'styling'] },
+  { name: 'manthanank', description: 'Official personal utility library of Manthan Ankolekar.', keywords: ['personal', 'utility', 'helper', 'manthanank'] }
+];
+
+// Fetch weekly download stats for each package
+async function fetchDownloads(packageName: string): Promise<number> {
+  try {
+    const res = await fetch(`https://api.npmjs.org/downloads/point/last-week/${packageName}`);
+    if (!res.ok) return 0;
+    const data = await res.json();
+    return data.downloads || 0;
+  } catch {
+    return 0;
+  }
+}
+
+// Fetch npm metadata for each package
+async function fetchNpmMeta(packageName: string): Promise<{ version: string; description: string } | null> {
+  try {
+    const res = await fetch(`https://registry.npmjs.org/${packageName}/latest`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    return { version: data.version, description: data.description };
+  } catch {
+    return null;
+  }
+}
+
+// Parallel fetch all packages
+const packagesWithStats = await Promise.all(
+  npmPackages.map(async (pkg) => {
+    const [downloads, meta] = await Promise.all([
+      fetchDownloads(pkg.name),
+      fetchNpmMeta(pkg.name),
+    ]);
+    return {
+      ...pkg,
+      description: meta?.description || pkg.description,
+      version: meta?.version || 'latest',
+      downloads,
+    };
+  })
+);
+
+// Sort by downloads
+packagesWithStats.sort((a, b) => b.downloads - a.downloads);
+
+const totalDownloads = packagesWithStats.reduce((sum, p) => sum + p.downloads, 0);
+---
+
+<BaseLayout title="NPM Packages | Manthan Ankolekar" description="Open-source npm packages published by Manthan Ankolekar.">
+  <section class="section packages-hero">
+    <div class="container">
+      <h1 class="section-title">NPM Packages</h1>
+      <p class="section-subtitle">Open-source packages I've built and published to the npm registry</p>
+      <div class="packages-stats reveal">
+        <div class="stat-card">
+          <div class="stat-number">{npmPackages.length}</div>
+          <div class="stat-label">Packages</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">{totalDownloads.toLocaleString()}</div>
+          <div class="stat-label">Weekly Downloads</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">Open</div>
+          <div class="stat-label">Source</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container packages-section">
+    <div class="packages-grid">
+      {packagesWithStats.map((pkg, i) => (
+        <div class={`package-card reveal reveal-delay-${(i % 3) + 1}`}>
+          <div class="package-header">
+            <div class="package-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            </div>
+            <div class="package-meta">
+              <h2 class="package-name">{pkg.name}</h2>
+              <span class="package-version">v{pkg.version}</span>
+            </div>
+          </div>
+          <p class="package-desc">{pkg.description}</p>
+          <div class="package-keywords">
+            {pkg.keywords.map(kw => <span class="keyword-tag">{kw}</span>)}
+          </div>
+          <div class="package-footer">
+            <div class="package-downloads">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+              <span>{pkg.downloads.toLocaleString()} / week</span>
+            </div>
+            <div class="package-links">
+              <a href={`https://www.npmjs.com/package/${pkg.name}`} target="_blank" rel="noopener noreferrer" class="pkg-link npm">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M0 0h24v24H0V0zm19.2 19.2H4.8V4.8h14.4v14.4zM8.4 8.4H6v7.2h2.4V10.8h2.4v4.8h2.4V8.4z"/></svg>
+                npm
+              </a>
+              <a href={`https://github.com/manthanank/${pkg.name}`} target="_blank" rel="noopener noreferrer" class="pkg-link gh">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+                GitHub
+              </a>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div class="packages-cta">
+      <p>All packages are MIT licensed and open-source. Contributions and feedback are welcome!</p>
+      <a href="https://www.npmjs.com/~manthanank" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+        View All on npm
+      </a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .packages-hero {
+    padding-top: 8rem;
+    padding-bottom: 0;
+  }
+
+  .packages-stats {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+    flex-wrap: wrap;
+  }
+
+  .stat-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 1.25rem 2rem;
+    text-align: center;
+    min-width: 120px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--color-gradient-start), var(--color-gradient-end));
+  }
+
+  .stat-number {
+    font-size: 1.75rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--color-gradient-start), var(--color-gradient-end));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-family: var(--font-mono);
+  }
+
+  .stat-label {
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    margin-top: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+  }
+
+  .packages-section {
+    padding-bottom: 5rem;
+    padding-top: 2rem;
+  }
+
+  .packages-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr));
+    gap: 1.5rem;
+  }
+
+  .package-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    transition: all var(--transition);
+  }
+
+  .package-card:hover {
+    border-color: var(--color-primary);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(0, 212, 255, 0.08);
+  }
+
+  .package-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.875rem;
+  }
+
+  .package-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: rgba(0, 212, 255, 0.1);
+    border: 1px solid rgba(0, 212, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-primary);
+    flex-shrink: 0;
+  }
+
+  .package-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .package-name {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    line-height: 1.3;
+  }
+
+  .package-version {
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
+    color: var(--color-primary);
+    background: rgba(0, 212, 255, 0.08);
+    padding: 0.1rem 0.45rem;
+    border-radius: 4px;
+    align-self: flex-start;
+  }
+
+  .package-desc {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    line-height: 1.65;
+    flex-grow: 1;
+  }
+
+  .package-keywords {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .keyword-tag {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--color-accent-light);
+    background: rgba(124, 58, 237, 0.1);
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+  }
+
+  .package-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .package-downloads {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.82rem;
+    font-family: var(--font-mono);
+    color: var(--color-text-muted);
+  }
+
+  .package-links {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .pkg-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.3rem 0.7rem;
+    border-radius: 6px;
+    border: 1px solid var(--color-border);
+    transition: all var(--transition);
+    color: var(--color-text-muted);
+  }
+
+  .pkg-link.npm:hover { color: #cb3837; border-color: #cb3837; background: rgba(203, 56, 55, 0.06); }
+  .pkg-link.gh:hover  { color: var(--color-text); border-color: var(--color-text-muted); }
+
+  .packages-cta {
+    text-align: center;
+    margin-top: 4rem;
+    padding: 3rem;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+
+  .packages-cta p {
+    color: var(--color-text-muted);
+    margin-bottom: 1.5rem;
+    font-size: 1.05rem;
+  }
+
+  @media (max-width: 768px) {
+    .packages-hero { padding-top: 6rem; }
+    .packages-grid { grid-template-columns: 1fr; }
+    .stat-card { min-width: 100px; padding: 1rem 1.5rem; }
+  }
+</style>

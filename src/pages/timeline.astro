@@ -1,0 +1,323 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const timeline = [
+  {
+    type: 'education',
+    period: '2018 – 2022',
+    title: 'Bachelor of Engineering',
+    subtitle: 'Computer Science & Engineering',
+    organization: 'VTU (Visvesvaraya Technological University)',
+    location: 'Karnataka, India',
+    highlights: [
+      'Final Year Project: Brain Tumor Detection using Flask & Machine Learning',
+      'Built Complaint Management System and Census Management System',
+      'Graduated with distinction'
+    ],
+    icon: '🎓',
+    color: 'education'
+  },
+  {
+    type: 'work',
+    period: 'Jan 2023 – Nov 2024',
+    title: 'Full Stack Developer',
+    subtitle: 'Software Engineer',
+    organization: 'Blackcoffer',
+    location: 'Remote',
+    highlights: [
+      'Led development of Patient Discharge & Call Monitoring system with real-time Socket.IO',
+      'Built comprehensive admin & client dashboards integrating 150+ REST APIs',
+      'Implemented authentication & authorization mechanisms from scratch',
+      'Deployed production apps on AWS for scalability'
+    ],
+    icon: '💼',
+    color: 'work'
+  },
+  {
+    type: 'work',
+    period: 'Nov 2024 – Jan 2026',
+    title: 'Full Stack Developer',
+    subtitle: 'Software Engineer',
+    organization: 'Senwell Group',
+    location: 'India',
+    highlights: [
+      'Developed scalable full-stack applications with Angular & Node.js',
+      'Worked with cross-functional teams on enterprise-grade projects',
+      'Mentored junior developers on Angular best practices',
+      'Contributed to technical architecture decisions'
+    ],
+    icon: '💼',
+    color: 'work'
+  },
+  {
+    type: 'milestone',
+    period: '2023 – Present',
+    title: 'Open Source & Content Creation',
+    subtitle: 'npm Publisher & Technical Writer',
+    organization: 'Self',
+    location: 'Global',
+    highlights: [
+      'Published 10+ npm packages with thousands of weekly downloads',
+      'Authored 39+ technical articles on Angular, Node.js, and TypeScript',
+      'Built manthanank.dev — a high-performance Astro portfolio',
+      'Active contributor on GitHub with 80+ repositories'
+    ],
+    icon: '🚀',
+    color: 'milestone'
+  },
+  {
+    type: 'current',
+    period: '2026 – Present',
+    title: 'Freelance & Open Source',
+    subtitle: 'Full Stack Developer',
+    organization: 'Independent',
+    location: 'Remote',
+    highlights: [
+      'Building performant web applications with modern tech stacks',
+      'Exploring Edge Functions, AI integrations, and Astro',
+      'Open to exciting full-time opportunities'
+    ],
+    icon: '⚡',
+    color: 'current'
+  }
+];
+---
+
+<BaseLayout title="Timeline | Manthan Ankolekar" description="My career journey from student to full stack developer.">
+  <section class="section timeline-hero">
+    <div class="container">
+      <h1 class="section-title">My Journey</h1>
+      <p class="section-subtitle">From curious student to full stack developer — a chronological story</p>
+    </div>
+  </section>
+
+  <section class="container timeline-section">
+    <div class="timeline">
+      {timeline.map((item, i) => (
+        <div class={`timeline-item reveal reveal-delay-${(i % 3) + 1} type-${item.color}`}>
+          <div class="timeline-icon">{item.icon}</div>
+          <div class="timeline-connector"></div>
+          <div class="timeline-card">
+            <div class="timeline-period">{item.period}</div>
+            <div class="timeline-header">
+              <div>
+                <h2 class="timeline-title">{item.title}</h2>
+                <p class="timeline-subtitle">{item.subtitle}</p>
+              </div>
+              <div class="timeline-org">
+                <span class="org-name">{item.organization}</span>
+                <span class="org-location">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                  {item.location}
+                </span>
+              </div>
+            </div>
+            <ul class="timeline-highlights">
+              {item.highlights.map(h => (
+                <li>{h}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div class="timeline-cta">
+      <p>Want to work together or learn more about my background?</p>
+      <div class="cta-buttons">
+        <a href="/contact" class="btn btn-primary">Get In Touch</a>
+        <a href="/resume.pdf" download class="btn btn-outline">Download Resume</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .timeline-hero {
+    padding-top: 8rem;
+    padding-bottom: 0;
+  }
+
+  .timeline-section {
+    padding-bottom: 5rem;
+    max-width: 900px;
+  }
+
+  .timeline {
+    position: relative;
+    padding: 2rem 0;
+    margin-top: 2rem;
+  }
+
+  /* Vertical line */
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 28px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, transparent, var(--color-border) 10%, var(--color-border) 90%, transparent);
+  }
+
+  .timeline-item {
+    position: relative;
+    padding-left: 72px;
+    margin-bottom: 2.5rem;
+  }
+
+  .timeline-icon {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--color-bg-card);
+    border: 2px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    z-index: 1;
+    transition: all var(--transition);
+  }
+
+  .timeline-item.type-education .timeline-icon { border-color: #89b4fa; background: rgba(137, 180, 250, 0.1); }
+  .timeline-item.type-work .timeline-icon        { border-color: var(--color-primary); background: rgba(0, 212, 255, 0.1); }
+  .timeline-item.type-milestone .timeline-icon   { border-color: #a6e3a1; background: rgba(166, 227, 161, 0.1); }
+  .timeline-item.type-current .timeline-icon     { border-color: #f9e2af; background: rgba(249, 226, 175, 0.1); box-shadow: 0 0 0 6px rgba(249, 226, 175, 0.08); }
+
+  .timeline-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 1.75rem;
+    transition: all var(--transition);
+  }
+
+  .timeline-item:hover .timeline-card {
+    border-color: var(--color-primary);
+    box-shadow: 0 8px 30px rgba(0, 212, 255, 0.07);
+    transform: translateX(4px);
+  }
+
+  .timeline-item.type-education:hover .timeline-card { border-color: #89b4fa; box-shadow: 0 8px 30px rgba(137,180,250,0.07); }
+  .timeline-item.type-milestone:hover .timeline-card { border-color: #a6e3a1; box-shadow: 0 8px 30px rgba(166,227,161,0.07); }
+  .timeline-item.type-current:hover .timeline-card   { border-color: #f9e2af; box-shadow: 0 8px 30px rgba(249,226,175,0.07); }
+
+  .timeline-period {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--color-primary);
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    letter-spacing: 0.05em;
+  }
+
+  .timeline-item.type-education .timeline-period { color: #89b4fa; }
+  .timeline-item.type-milestone .timeline-period { color: #a6e3a1; }
+  .timeline-item.type-current .timeline-period   { color: #f9e2af; }
+
+  .timeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .timeline-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 0.25rem;
+  }
+
+  .timeline-subtitle {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+  }
+
+  .timeline-org {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.35rem;
+    flex-shrink: 0;
+  }
+
+  .org-name {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+
+  .org-location {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+  }
+
+  .timeline-highlights {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .timeline-highlights li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+  }
+
+  .timeline-highlights li::before {
+    content: '→';
+    color: var(--color-primary);
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 0.05rem;
+  }
+
+  .timeline-cta {
+    text-align: center;
+    margin-top: 4rem;
+    padding: 3rem;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+
+  .timeline-cta p {
+    color: var(--color-text-muted);
+    margin-bottom: 1.5rem;
+    font-size: 1.05rem;
+  }
+
+  .cta-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 768px) {
+    .timeline-hero { padding-top: 6rem; }
+    .timeline::before { left: 20px; }
+    .timeline-item { padding-left: 54px; }
+    .timeline-icon { width: 42px; height: 42px; font-size: 1.1rem; }
+    .timeline-header { flex-direction: column; gap: 0.5rem; }
+    .timeline-org { align-items: flex-start; }
+    .timeline-card { padding: 1.25rem; }
+    .timeline-cta { padding: 2rem 1.25rem; }
+  }
+</style>
