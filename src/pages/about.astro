@@ -14,9 +14,9 @@ const testimonials = [
   }
 ];
 
-const frontendSkills = ['Angular', 'RxJS', 'TypeScript', 'JavaScript', 'HTML5', 'CSS3', 'SCSS'];
-const backendSkills = ['Node.js', 'Express.js', 'Flask', 'Python', 'FastAPI ',  'REST APIs', 'WebSockets'];
-const databaseSkills = ['MongoDB', 'MySQL', 'PostgreSQL', 'Firebase'];
+const frontendSkills = ['Angular', 'Astro', 'RxJS', 'TypeScript', 'JavaScript', 'HTML5', 'CSS3', 'SCSS'];
+const backendSkills = ['Node.js', 'Express.js', 'Flask', 'Python', 'FastAPI', 'REST APIs', 'WebSockets'];
+const databaseSkills = ['PostgreSQL', 'Supabase', 'MongoDB', 'MySQL', 'Firebase'];
 const toolsSkills = ['Git', 'GitHub', 'GitLab', 'Bitbucket', 'Docker', 'CI/CD Pipelines', 'Jira', 'Postman'];
 const cloudSkills = ['AWS', 'GCP', 'Microsoft Azure'];
 
@@ -126,6 +126,19 @@ try {
 }
 
 const experience = [
+  {
+    title: 'Independent Full Stack Developer',
+    company: 'Freelance & own products',
+    period: 'Feb 2025 - Present',
+    description: [
+      'Building ReconOS, a reconditioning platform for used-car dealerships, from the board and SLA engine through imports, reporting and a browser extension',
+      'Building CarePulse, remote patient monitoring for clinics, with daily check-ins, an alert queue and RPM billing',
+      'Building Handoff, service handover tooling, shipped to production',
+      'Running the full stack end to end: Astro and Angular front ends, Node.js APIs, Supabase/Postgres, Docker and AWS, with CI/CD on every repo',
+    ],
+    skills: ['Astro', 'Angular', 'Node.js', 'TypeScript', 'Supabase', 'PostgreSQL', 'Docker', 'AWS'],
+    colleagues: ['Dealership operators', 'Clinic staff', 'Early customers']
+  },
   {
     title: 'Software Developer',
     company: 'Senwell Group Pvt Ltd',
@@ -247,7 +260,7 @@ const {
         </div>
         <div class="about-stats">
           <div class="stat">
-            <span class:list={["stat-number", { skeleton: !repos }]}>{repos || '80+'}</span>
+            <span class:list={["stat-number", { skeleton: !repos }]}>{repos || '200+'}</span>
             <span class="stat-label">Repositories</span>
           </div>
           <div class="stat">
@@ -259,7 +272,7 @@ const {
             <span class="stat-label">Contributions</span>
           </div>
           <div class="stat">
-            <span class="stat-number">10+</span>
+            <span class="stat-number">16</span>
             <span class="stat-label">NPM Packages</span>
           </div>
         </div>
@@ -454,9 +467,9 @@ const {
         </button>
         <div class="modal-body">
           <div class="modal-header">
-            <span class="modal-meta-period">Oct 2024 - Jan 2025</span>
-            <h3 class="modal-title">Software Developer</h3>
-            <p class="modal-company">Senwell Group Pvt Ltd</p>
+            <span class="modal-meta-period">Feb 2025 - Present</span>
+            <h3 class="modal-title">Independent Full Stack Developer</h3>
+            <p class="modal-company">Freelance &amp; own products</p>
           </div>
           
           <div class="modal-section">

@@ -7,8 +7,8 @@ import { getCollection } from 'astro:content';
 import { db, PageViews, PageLikes } from 'astro:db';
 
 const skills = [
-  'Angular', 'RxJS', 'Node.js', 'Express.js', 'TypeScript',
-  'JavaScript', 'MongoDB', 'MySQL', 'PostgreSQL', 'Firebase',
+  'Angular', 'Astro', 'RxJS', 'Node.js', 'Express.js', 'TypeScript',
+  'JavaScript', 'PostgreSQL', 'Supabase', 'MongoDB', 'MySQL', 'Firebase',
   'Git', 'REST APIs', 'AWS', 'Docker', 'Python', 'FastAPI', 'Flask'
 ];
 
@@ -96,7 +96,9 @@ try {
         const slug = projectSlugsMap.get(repo.name.toLowerCase()) || projectTitlesMap.get(title.toLowerCase());
         return {
           title,
-          description: repo.description || 'A project built with modern web technologies.',
+          // No filler: a repo with no GitHub description shows none, which
+          // reads better than four identical sentences down the page.
+          description: repo.description || '',
           tags: repo.languages?.nodes.map((l: any) => l.name) || [],
           github: repo.url,
           live: repo.homepageUrl || undefined,
@@ -110,7 +112,7 @@ try {
   console.warn('Failed to fetch pinned GitHub repos, using fallback data.');
 }
 
-const DEVTO_USERNAME = 'manthan_ank';
+const DEVTO_USERNAME = 'manthanank';
 
 // Get local posts
 const localPosts = await getCollection('blog', ({ data }) => !data.draft);

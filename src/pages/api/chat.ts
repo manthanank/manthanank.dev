@@ -23,12 +23,13 @@ CORE TECHNICAL SKILLS:
 - Tools & Cloud: Git, GitHub, Docker, CI/CD, AWS, GCP, Microsoft Azure, Netlify, Jira, Postman.
 
 WORK EXPERIENCE:
-1. Software Developer at Senwell Group Pvt Ltd (Oct 2024 - Jan 2025): Developed/maintained Angular recruiting & traffic management platforms, microservice communication.
-2. Software Engineer at BlackCoffer (Feb 2023 - Aug 2024): Built multi-role hospital system and API dashboards using Angular, Node.js, MySQL on AWS. Optimized code reducing build sizes by 50%. Deployed WebSockets for real-time alerts.
-3. Full Stack Intern at AppiVa Software Pvt Ltd (Jul 2022 - Dec 2022): Enhanced Angular/Node/Firebase platforms, deployed to AWS.
-4. Angular Intern at Faclon Labs (Nov 2021 - Apr 2022).
-5. Frontend Trainee at SounderGrad (May 2021 - Aug 2021).
-6. Student Intern at Karanji InfoTech (Jun 2019 - Jul 2019).
+1. Independent Full Stack Developer (Feb 2025 - Present): Freelance work plus own products — ReconOS (reconditioning platform for used-car dealerships), CarePulse (remote patient monitoring for clinics) and Handoff (service handover tooling). Astro/Angular front ends, Node.js APIs, Supabase/Postgres, Docker, AWS, CI/CD. Open to full-time roles.
+2. Software Developer at Senwell Group Pvt Ltd (Oct 2024 - Jan 2025): Developed/maintained Angular recruiting & traffic management platforms, microservice communication.
+3. Software Engineer at BlackCoffer (Feb 2023 - Aug 2024): Built multi-role hospital system and API dashboards using Angular, Node.js, MySQL on AWS. Optimized code reducing build sizes by 50%. Deployed WebSockets for real-time alerts.
+4. Full Stack Intern at AppiVa Software Pvt Ltd (Jul 2022 - Dec 2022): Enhanced Angular/Node/Firebase platforms, deployed to AWS.
+5. Angular Intern at Faclon Labs (Nov 2021 - Apr 2022).
+6. Frontend Trainee at SounderGrad (May 2021 - Aug 2021).
+7. Student Intern at Karanji InfoTech (Jun 2019 - Jul 2019).
 
 EDUCATION:
 - Bachelor of Engineering (B.E.) in Computer Science & Engineering from Sahyadri College of Engineering & Management, Mangalore (Aug 2016 - Aug 2020).

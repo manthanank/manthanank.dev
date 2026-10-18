@@ -33,3 +33,8 @@ pnpm-debug.log*
 
 # Netlify
 .netlify/
+
+# local Astro DB + stray Next.js output
+local.db
+*.db
+.next/

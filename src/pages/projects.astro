@@ -94,7 +94,9 @@ try {
         const slug = projectSlugsMap.get(repo.name.toLowerCase()) || projectTitlesMap.get(title.toLowerCase());
         return {
           title,
-          description: repo.description || 'A project built with modern web technologies.',
+          // No filler: a repo with no GitHub description shows none, which
+          // reads better than four identical sentences down the page.
+          description: repo.description || '',
           tags: repo.languages?.nodes.map((l: any) => l.name) || [],
           github: repo.url,
           live: repo.homepageUrl || undefined,

@@ -3,6 +3,9 @@ export const prerender = false;
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { db, PageViews, PageLikes, Guestbook, Subscribers } from 'astro:db';
 import { getCollection } from 'astro:content';
+import { NPM_PACKAGE_NAMES } from '../data/npm-packages';
+
+const DEVTO_USERNAME = 'manthanank';
 
 // Fetch Astro DB Stats
 const viewsData = await db.select().from(PageViews);
@@ -15,22 +18,25 @@ const totalLikes = likesData.reduce((acc, l) => acc + l.count, 0);
 const totalGuestbook = guestbookEntries.length;
 const totalSubscribers = subscriberEntries.length;
 
-// Fetch blog posts
+// Fetch blog posts. The blog page lists local posts plus Dev.to, so count
+// both here — counting only the local collection reported 9 against the
+// blog's own 39.
 const posts = await getCollection('blog', ({ data }) => !data.draft);
-const totalBlogPosts = posts.length;
+let devtoCount = 0;
+try {
+  const res = await fetch(`https://dev.to/api/articles?username=${DEVTO_USERNAME}`);
+  if (res.ok) {
+    const data = await res.json();
+    if (Array.isArray(data)) devtoCount = data.length;
+  }
+} catch {
+  // Dev.to unreachable: fall back to the local count rather than failing the page.
+}
+const totalBlogPosts = posts.length + devtoCount;
 
-// Fetch NPM download counts
-const npmPackages = [
-  'learn-angular',
-  'learn-rxjs',
-  'learn-mongodb',
-  'learn-javascript',
-  'learn-docker',
-  'learn-nestjs',
-  'learn-html',
-  'learn-css',
-  'manthanank',
-];
+// Fetch NPM download counts for every published package (shared list, so this
+// total and the one on /packages cannot drift apart again).
+const npmPackages = NPM_PACKAGE_NAMES;
 
 let totalNpmDownloads = 0;
 try {
@@ -116,11 +122,13 @@ try {
   // Silent fallback
 }
 
-// Curated Spotify Now Playing details (Mock / Dynamic)
-const isCurrentlyListening = true; // Make it visual
-const trackName = 'Lofi Beats for Coding';
-const trackArtist = 'Chillhop Records';
-const trackAlbum = 'Coding Sessions Vol. 1';
+// Spotify is not connected to a real account yet. This page is titled
+// "real-time", so it shows "Currently Offline" rather than a hardcoded track
+// that never changes. Wire a Spotify token in and set these from the API.
+const isCurrentlyListening = false;
+const trackName = '';
+const trackArtist = '';
+const trackAlbum = '';
 
 // WakaTime Coding statistics (7-day high fidelity metrics)
 const wakaLanguages = [
