@@ -23,7 +23,7 @@ CORE TECHNICAL SKILLS:
 - Tools & Cloud: Git, GitHub, Docker, CI/CD, AWS, GCP, Microsoft Azure, Netlify, Jira, Postman.
 
 WORK EXPERIENCE:
-1. Independent Full Stack Developer (Feb 2025 - Present): Freelance work plus own products — ReconOS (reconditioning platform for used-car dealerships), CarePulse (remote patient monitoring for clinics) and Handoff (service handover tooling). Astro/Angular front ends, Node.js APIs, Supabase/Postgres, Docker, AWS, CI/CD. Open to full-time roles.
+1. Independent Full Stack Developer (Feb 2025 - Present): Freelance and client work building line-of-business web applications end to end — multi-tenant Postgres schemas with row-level security, Node.js APIs, Astro/Angular front ends, Docker, AWS and CI/CD with migrations and rollback. Do not name specific client products. Open to full-time roles.
 2. Software Developer at Senwell Group Pvt Ltd (Oct 2024 - Jan 2025): Developed/maintained Angular recruiting & traffic management platforms, microservice communication.
 3. Software Engineer at BlackCoffer (Feb 2023 - Aug 2024): Built multi-role hospital system and API dashboards using Angular, Node.js, MySQL on AWS. Optimized code reducing build sizes by 50%. Deployed WebSockets for real-time alerts.
 4. Full Stack Intern at AppiVa Software Pvt Ltd (Jul 2022 - Dec 2022): Enhanced Angular/Node/Firebase platforms, deployed to AWS.

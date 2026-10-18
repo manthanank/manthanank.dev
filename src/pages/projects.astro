@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import { getCollection } from 'astro:content';
 import { db, PageViews, PageLikes } from 'astro:db';
+import { isExcludedRepo } from '../data/excluded-repos';
 
 const localProjects = await getCollection('projects');
 const projectSlugsMap = new Map(localProjects.map(p => [p.id, p.id]));
@@ -70,7 +71,9 @@ try {
     const { data } = await res.json();
     const user = data?.user;
 
-    pinnedProjects = user?.pinnedItems?.nodes.map((repo: any) => {
+    pinnedProjects = user?.pinnedItems?.nodes
+      .filter((repo: any) => !isExcludedRepo(repo.name))
+      .map((repo: any) => {
       const title = repo.name.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
       const slug = projectSlugsMap.get(repo.name.toLowerCase()) || projectTitlesMap.get(title.toLowerCase());
       return {
@@ -87,7 +90,7 @@ try {
     const pinnedNames = user?.pinnedItems?.nodes.map((repo: any) => repo.name) || [];
 
     otherProjects = user?.repositories?.nodes
-      .filter((repo: any) => !repo.isArchived && !pinnedNames.includes(repo.name))
+      .filter((repo: any) => !repo.isArchived && !pinnedNames.includes(repo.name) && !isExcludedRepo(repo.name))
       .slice(0, 12)
       .map((repo: any) => {
         const title = repo.name.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());

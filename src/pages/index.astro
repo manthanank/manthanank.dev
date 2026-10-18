@@ -4,6 +4,7 @@ import SkillBadge from '../components/SkillBadge.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import BlogCard from '../components/BlogCard.astro';
 import { getCollection } from 'astro:content';
+import { isExcludedRepo } from '../data/excluded-repos';
 import { db, PageViews, PageLikes } from 'astro:db';
 
 const skills = [
@@ -91,7 +92,9 @@ try {
     const pinnedNodes = data?.user?.pinnedItems?.nodes;
     
     if (Array.isArray(pinnedNodes) && pinnedNodes.length > 0) {
-      featuredProjects = pinnedNodes.map((repo: any) => {
+      featuredProjects = pinnedNodes
+        .filter((repo: any) => !isExcludedRepo(repo.name))
+        .map((repo: any) => {
         const title = repo.name.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
         const slug = projectSlugsMap.get(repo.name.toLowerCase()) || projectTitlesMap.get(title.toLowerCase());
         return {
@@ -185,7 +188,7 @@ const likesMap = new Map(allLikes.map(l => [l.slug, l.count]));
         <h1 class="hero-name">Manthan Ankolekar</h1>
         <h2 class="hero-headline">I <span id="typewriter">build things for the web.</span><span class="cursor" aria-hidden="true">|</span></h2>
         <p class="hero-description">
-          I build operations software for dealerships and clinics — reconditioning, service handover, remote patient monitoring — end to end, from the Postgres schema to the shop-floor screen. Currently independent, and open to full-time roles.
+          I'm a <strong>Full Stack Developer</strong> who builds line-of-business web applications end to end — from the Postgres schema to the screen people use all day. Currently independent, and open to full-time roles.
         </p>
         <div class="hero-cta">
           <a href="/projects" class="btn btn-primary btn-magnetic">View My Work</a>
