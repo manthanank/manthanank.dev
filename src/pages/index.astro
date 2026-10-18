@@ -112,6 +112,26 @@ try {
   console.warn('Failed to fetch pinned GitHub repos, using fallback data.');
 }
 
+// Case studies lead. A written project has a problem, a hard part and a
+// result; a pinned repo is a name and a language list — and the pins change
+// without anyone touching this site.
+const caseStudies = localProjects
+  .filter((p) => p.data.featured)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .map((p) => ({
+    title: p.data.title,
+    description: p.data.description,
+    tags: p.data.tags,
+    github: p.data.github,
+    live: p.data.live,
+    slug: p.id,
+  }));
+
+featuredProjects = [
+  ...caseStudies,
+  ...featuredProjects.filter((p) => !caseStudies.some((c) => c.slug === p.slug)),
+].slice(0, 6);
+
 const DEVTO_USERNAME = 'manthanank';
 
 // Get local posts
@@ -165,7 +185,7 @@ const likesMap = new Map(allLikes.map(l => [l.slug, l.count]));
         <h1 class="hero-name">Manthan Ankolekar</h1>
         <h2 class="hero-headline">I <span id="typewriter">build things for the web.</span><span class="cursor" aria-hidden="true">|</span></h2>
         <p class="hero-description">
-          I'm a <strong>Full Stack Developer</strong> specializing in building exceptional digital experiences. Currently, I'm focused on creating performant, user-centric applications with <strong>Angular</strong> and <strong>Node.js</strong>.
+          I build operations software for dealerships and clinics — reconditioning, service handover, remote patient monitoring — end to end, from the Postgres schema to the shop-floor screen. Currently independent, and open to full-time roles.
         </p>
         <div class="hero-cta">
           <a href="/projects" class="btn btn-primary btn-magnetic">View My Work</a>

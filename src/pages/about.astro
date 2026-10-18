@@ -341,17 +341,18 @@ const {
       <h2 class="section-title">Skills</h2>
       <p class="section-subtitle">My core competencies and areas of expertise</p>
  
-      <!-- Proficiency Chart -->
+      <!-- Evidence rather than self-scored bars. "Angular 92%" is a number
+           only I can assign and nobody can check; every line below can be
+           opened in another tab. -->
       <div class="proficiency-chart reveal" id="proficiency-chart">
-        <h3 class="chart-heading">Proficiency Overview</h3>
-        <div class="chart-bars">
-          <div class="chart-row"><span class="chart-label">Angular / Frontend</span><div class="chart-bar-track"><div class="chart-bar" data-pct="92"><span class="chart-pct">92%</span></div></div></div>
-          <div class="chart-row"><span class="chart-label">TypeScript</span><div class="chart-bar-track"><div class="chart-bar" data-pct="88"><span class="chart-pct">88%</span></div></div></div>
-          <div class="chart-row"><span class="chart-label">RxJS</span><div class="chart-bar-track"><div class="chart-bar" data-pct="84"><span class="chart-pct">84%</span></div></div></div>
-          <div class="chart-row"><span class="chart-label">Node.js / Express</span><div class="chart-bar-track"><div class="chart-bar bar-backend" data-pct="80"><span class="chart-pct">80%</span></div></div></div>
-          <div class="chart-row"><span class="chart-label">Databases (SQL/NoSQL)</span><div class="chart-bar-track"><div class="chart-bar bar-backend" data-pct="75"><span class="chart-pct">75%</span></div></div></div>
-          <div class="chart-row"><span class="chart-label">Cloud (AWS/GCP/Azure)</span><div class="chart-bar-track"><div class="chart-bar bar-cloud" data-pct="65"><span class="chart-pct">65%</span></div></div></div>
-        </div>
+        <h3 class="chart-heading">Rather than a percentage</h3>
+        <ul class="evidence-list">
+          <li><strong>4+ years of Angular in production</strong> — recruitment platforms, tolling and traffic systems, a multi-role hospital system, API dashboards</li>
+          <li><strong>3 products built end to end</strong> — ReconOS, Handoff and CarePulse: schema, API, UI, deploys and the on-call that follows</li>
+          <li><strong>16 npm packages published</strong>, with live weekly download counts on the <a href="/packages">packages page</a></li>
+          <li><strong>39 articles written</strong> on Angular, Node.js and TypeScript, on <a href="/blog">this blog</a> and Dev.to</li>
+          <li><strong>Production infrastructure I run myself</strong> — Docker, Postgres, CI to a container registry, migrations and rollback on every deploy</li>
+        </ul>
       </div>
 
       <div class="skills-categories">
@@ -665,6 +666,41 @@ const {
       font-weight: 700;
       margin-bottom: 1.5rem;
       color: var(--color-text);
+    }
+
+    .evidence-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+
+    .evidence-list li {
+      position: relative;
+      padding-left: 1.4rem;
+      color: var(--color-text-muted);
+      line-height: 1.6;
+    }
+
+    .evidence-list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.62em;
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 2px;
+      background: var(--color-primary);
+    }
+
+    .evidence-list strong {
+      color: var(--color-text);
+    }
+
+    .evidence-list a {
+      color: var(--color-primary);
     }
 
     .chart-bars {
