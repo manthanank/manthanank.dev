@@ -1,18 +1,17 @@
 // Repositories this site never shows, whatever GitHub returns.
 //
-// The projects pages are built from the GitHub API — pinned repos plus the
-// most recent ones — so anything public shows up on its own. These products
-// are kept separate from the portfolio deliberately: no case study, no card,
-// no mention. Pinning one on GitHub must not put it back on the site.
+// The projects pages are built from the GitHub API: pinned repos plus the
+// most recent ones. Private repositories are filtered out in the queries
+// themselves (privacy: PUBLIC / isPrivate). Any extra names to hide are read
+// at build time from the EXCLUDED_REPOS environment variable, as a
+// comma-separated list, so they never need to live in the source.
 //
 // Matching is on the repository name, lowercased, and covers the obvious
 // variants so a rename does not quietly reintroduce one.
-const EXCLUDED = [
-  'reconos',
-  'recon',
-  'handoff',
-  'carepulse',
-];
+const EXCLUDED: string[] = String(import.meta.env.EXCLUDED_REPOS ?? '')
+  .split(',')
+  .map((s) => s.trim().toLowerCase())
+  .filter(Boolean);
 
 export function isExcludedRepo(name: string | undefined | null): boolean {
   if (!name) return false;

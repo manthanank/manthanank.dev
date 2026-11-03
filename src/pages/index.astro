@@ -8,9 +8,10 @@ import { isExcludedRepo } from '../data/excluded-repos';
 import { db, PageViews, PageLikes } from 'astro:db';
 
 const skills = [
-  'Angular', 'Astro', 'RxJS', 'Node.js', 'Express.js', 'TypeScript',
-  'JavaScript', 'PostgreSQL', 'Supabase', 'MongoDB', 'MySQL', 'Firebase',
-  'Git', 'REST APIs', 'AWS', 'Docker', 'Python', 'FastAPI', 'Flask'
+  'Next.js', 'React', 'Angular', 'RxJS', 'Tailwind CSS', 'TypeScript',
+  'JavaScript', 'Python', 'Node.js', 'Express.js', 'Flask', 'RabbitMQ',
+  'PostgreSQL', 'MongoDB', 'MySQL', 'Redis', 'Supabase', 'Firebase',
+  'LLMs', 'AWS', 'GCP', 'Docker'
 ];
 
 const fallbackFeaturedProjects = [
@@ -25,7 +26,7 @@ const fallbackFeaturedProjects = [
     title: 'Learn Angular',
     description: 'A comprehensive learning resource for Angular developers with examples, best practices, and hands-on projects.',
     tags: ['Angular', 'TypeScript', 'RxJS'],
-    github: 'https://github.com/manthanank/learn-angular',
+    github: 'https://github.com/TheLearningHubOrg/learn-angular',
     live: 'https://learn-angular.netlify.app',
     slug: 'learn-angular'
   },
@@ -48,6 +49,7 @@ const query = `
         nodes {
           ... on Repository {
             name
+            isPrivate
             description
             url
             homepageUrl
@@ -93,7 +95,7 @@ try {
     
     if (Array.isArray(pinnedNodes) && pinnedNodes.length > 0) {
       featuredProjects = pinnedNodes
-        .filter((repo: any) => !isExcludedRepo(repo.name))
+        .filter((repo: any) => !repo.isPrivate && !isExcludedRepo(repo.name))
         .map((repo: any) => {
         const title = repo.name.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
         const slug = projectSlugsMap.get(repo.name.toLowerCase()) || projectTitlesMap.get(title.toLowerCase());
@@ -179,7 +181,7 @@ const viewsMap = new Map(allViews.map(v => [v.slug, v.count]));
 const likesMap = new Map(allLikes.map(l => [l.slug, l.count]));
 ---
 
-<BaseLayout title="Manthan Ankolekar | Full Stack Developer">
+<BaseLayout title="Manthan Ankolekar | Full-Stack Software Engineer" description="Manthan Ankolekar is a full-stack software engineer with 3.5+ years of experience in Next.js, Angular, Node.js and Python. Open to full-time roles and freelance projects, remote or on-site.">
   <!-- Hero Section -->
   <section class="hero">
     <div class="container hero-content">
@@ -188,7 +190,7 @@ const likesMap = new Map(allLikes.map(l => [l.slug, l.count]));
         <h1 class="hero-name">Manthan Ankolekar</h1>
         <h2 class="hero-headline">I <span id="typewriter">build things for the web.</span><span class="cursor" aria-hidden="true">|</span></h2>
         <p class="hero-description">
-          I'm a <strong>Full Stack Developer</strong> who builds line-of-business web applications end to end — from the Postgres schema to the screen people use all day. Currently independent, and open to full-time roles.
+          I'm a <strong>Full-Stack Software Engineer</strong> with 3.5+ years of experience building scalable web applications, microservices and AI-driven workflows in Next.js, Angular, Node.js and Python. Open to full-time roles and freelance projects, remote or on-site.
         </p>
         <div class="hero-cta">
           <a href="/projects" class="btn btn-primary btn-magnetic">View My Work</a>
@@ -220,9 +222,9 @@ const likesMap = new Map(allLikes.map(l => [l.slug, l.count]));
 
       const codeHTML = `<span class="kw">const</span> <span class="var">developer</span> = {
   <span class="key">name</span>: <span class="str">"Manthan Ankolekar"</span>,
-  <span class="key">role</span>: <span class="str">"Full Stack Developer"</span>,
-  <span class="key">skills</span>: [<span class="str">"Angular"</span>, <span class="str">"Node.js"</span>,
-           <span class="str">"TypeScript"</span>, <span class="str">"MongoDB"</span>],
+  <span class="key">role</span>: <span class="str">"Full-Stack Software Engineer"</span>,
+  <span class="key">skills</span>: [<span class="str">"Next.js"</span>, <span class="str">"Angular"</span>,
+           <span class="str">"Node.js"</span>, <span class="str">"Python"</span>],
   <span class="key">passion</span>: <span class="str">"Building great UX"</span>,
   <span class="key">coffee</span>: <span class="bool">true</span>,
 };`;

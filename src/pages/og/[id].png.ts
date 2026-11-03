@@ -11,7 +11,7 @@ export async function getStaticPaths() {
   const blogPosts = await getCollection('blog');
   
   const mainPages = [
-    { id: 'home', title: 'Manthan Ankolekar', description: 'Full Stack Developer Portfolio • Building exceptional digital experiences.' },
+    { id: 'home', title: 'Manthan Ankolekar', description: 'Full-Stack Software Engineer • Next.js, Angular, Node.js and Python.' },
     { id: 'about', title: 'About Me', description: 'Learn more about my journey, skills, and the technologies I use to build the web.' },
     { id: 'projects', title: 'My Projects', description: 'A showcase of my recent work, open-source contributions, and technical experiments.' },
     { id: 'blog', title: 'Technical Blog', description: 'Thoughts, tutorials, and deep dives into Angular, Node.js, and modern web development.' },
@@ -221,7 +221,7 @@ export const GET: APIRoute = async ({ params, props }) => {
                               fontSize: '20px',
                               color: '#94a3b8',
                             },
-                            children: 'Full Stack Developer • manthanank.dev',
+                            children: 'Full-Stack Software Engineer • manthanank.dev',
                           },
                         },
                       ],

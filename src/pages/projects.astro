@@ -20,6 +20,7 @@ const query = `
         nodes {
           ... on Repository {
             name
+            isPrivate
             description
             url
             homepageUrl
@@ -32,7 +33,7 @@ const query = `
           }
         }
       }
-      repositories(first: 20, orderBy: {field: UPDATED_AT, direction: DESC}, ownerAffiliations: OWNER, isFork: false) {
+      repositories(first: 20, privacy: PUBLIC, orderBy: {field: UPDATED_AT, direction: DESC}, ownerAffiliations: OWNER, isFork: false) {
         nodes {
           name
           description
@@ -72,7 +73,7 @@ try {
     const user = data?.user;
 
     pinnedProjects = user?.pinnedItems?.nodes
-      .filter((repo: any) => !isExcludedRepo(repo.name))
+      .filter((repo: any) => !repo.isPrivate && !isExcludedRepo(repo.name))
       .map((repo: any) => {
       const title = repo.name.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
       const slug = projectSlugsMap.get(repo.name.toLowerCase()) || projectTitlesMap.get(title.toLowerCase());
@@ -118,7 +119,7 @@ try {
       title: 'Learn Angular',
       description: 'A comprehensive learning resource for Angular developers with examples, best practices, and hands-on projects.',
       tags: ['Angular', 'TypeScript', 'RxJS'],
-      github: 'https://github.com/manthanank/learn-angular',
+      github: 'https://github.com/TheLearningHubOrg/learn-angular',
       live: 'https://learn-angular.netlify.app',
       slug: 'learn-angular'
     },
@@ -126,7 +127,7 @@ try {
       title: 'Learn Node.js',
       description: 'A curated learning resource for Node.js fundamentals, backend patterns, and real-world examples.',
       tags: ['Node.js', 'JavaScript', 'Backend'],
-      github: 'https://github.com/manthanank/learn-nodejs',
+      github: 'https://github.com/TheLearningHubOrg/learn-nodejs',
     },
   ];
 
@@ -189,7 +190,7 @@ const allProjectsCombined = [...pinnedProjects, ...resumeProjects, ...otherProje
 const allTags = Array.from(new Set(allProjectsCombined.flatMap(p => p.tags || []))).sort();
 ---
 
-<BaseLayout title="Projects | Manthan Ankolekar" description="A showcase of my recent work and open source contributions.">
+<BaseLayout title="Projects | Manthan Ankolekar" description="Projects and open source work by Manthan Ankolekar, full-stack software engineer: Next.js, Angular, Node.js and Python.">
   <section class="section projects-hero">
     <div class="container">
       <h1 class="section-title">Projects</h1>

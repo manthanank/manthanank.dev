@@ -18,7 +18,7 @@ interface Props {
 
 const { 
   title, 
-  description = 'Manthan Ankolekar - Full Stack Developer Portfolio', 
+  description = 'Manthan Ankolekar, full-stack software engineer: Next.js, Angular, Node.js and Python. Open to full-time roles and freelance projects, remote or on-site.', 
   image,
   ogId 
 } = Astro.props;
@@ -100,11 +100,27 @@ const finalOgImage = image || `/og/${finalOgId}.png`;
       "image": "https://manthanank.dev/profile.jpg",
       "sameAs": [
         "https://github.com/manthanank",
-        "https://linkedin.com/in/manthanank",
-        "https://x.com/manthan_ank"
+        "https://www.linkedin.com/in/manthan-ankolekar-597b07a8/",
+        "https://x.com/manthan_ank",
+        "https://dev.to/manthanank",
+        "https://manthanank.hashnode.dev",
+        "https://gitlab.com/manthanank",
+        "https://www.npmjs.com/~manthanankolekar"
       ],
-      "jobTitle": "Full Stack Developer",
-      "description": "Full Stack Developer specializing in building exceptional digital experiences with Angular, Node.js, and modern web technologies."
+      "jobTitle": "Full-Stack Software Engineer",
+      "email": "mailto:manthan.ank46@gmail.com",
+      "address": {
+        "@type": "PostalAddress",
+        "addressRegion": "Karnataka",
+        "addressCountry": "IN"
+      },
+      "knowsLanguage": ["English", "Hindi", "Kannada"],
+      "alumniOf": {
+        "@type": "CollegeOrUniversity",
+        "name": "Sahyadri College of Engineering & Management"
+      },
+      "knowsAbout": ["Next.js", "React", "Angular", "Node.js", "Python", "Flask", "TypeScript", "PostgreSQL", "MongoDB", "LLMs", "AWS", "Docker"],
+      "description": "Full-stack software engineer with 3.5+ years of experience building scalable web applications, microservices and AI-driven workflows. Open to full-time roles and freelance projects, remote or on-site."
     })} />
 
     <script type="application/ld+json" is:inline set:html={JSON.stringify({
@@ -112,7 +128,7 @@ const finalOgImage = image || `/og/${finalOgId}.png`;
       "@type": "WebSite",
       "name": "Manthan Ankolekar | Portfolio",
       "url": "https://manthanank.dev",
-      "description": "Full Stack Developer Portfolio showcasing projects and technical deep dives."
+      "description": "Portfolio of Manthan Ankolekar, full-stack software engineer, with projects, articles and technical deep dives."
     })} />
 
     <title>{title}</title>
