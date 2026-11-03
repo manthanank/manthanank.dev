@@ -2,7 +2,7 @@
 interface Props {
   name: string;
   role: string;
-  company: string;
+  company?: string;
   content: string;
   avatar?: string;
 }
@@ -23,7 +23,7 @@ const { name, role, company, content, avatar } = Astro.props;
     )}
     <div class="author-info">
       <h4 class="author-name">{name}</h4>
-      <p class="author-role">{role} at {company}</p>
+      <p class="author-role">{company ? `${role} at ${company}` : role}</p>
     </div>
   </div>
 </div>

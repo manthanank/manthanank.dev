@@ -60,10 +60,6 @@ const totalDownloads = packagesWithStats.reduce((sum, p) => sum + p.downloads, 0
           <div class="stat-label">Packages</div>
         </div>
         <div class="stat-card">
-          <div class="stat-number">{totalDownloads.toLocaleString()}</div>
-          <div class="stat-label">Weekly Downloads</div>
-        </div>
-        <div class="stat-card">
           <div class="stat-number">Open</div>
           <div class="stat-label">Source</div>
         </div>
@@ -89,10 +85,6 @@ const totalDownloads = packagesWithStats.reduce((sum, p) => sum + p.downloads, 0
             {pkg.keywords.map(kw => <span class="keyword-tag">{kw}</span>)}
           </div>
           <div class="package-footer">
-            <div class="package-downloads">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-              <span>{pkg.downloads.toLocaleString()} / week</span>
-            </div>
             <div class="package-links">
               <a href={`https://www.npmjs.com/package/${pkg.name}`} target="_blank" rel="noopener noreferrer" class="pkg-link npm">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M0 0h24v24H0V0zm19.2 19.2H4.8V4.8h14.4v14.4zM8.4 8.4H6v7.2h2.4V10.8h2.4v4.8h2.4V8.4z"/></svg>
@@ -110,7 +102,7 @@ const totalDownloads = packagesWithStats.reduce((sum, p) => sum + p.downloads, 0
 
     <div class="packages-cta">
       <p>All packages are MIT licensed and open-source. Contributions and feedback are welcome!</p>
-      <a href="https://www.npmjs.com/~manthanank" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+      <a href="https://www.npmjs.com/~manthanankolekar" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
         View All on npm
       </a>
     </div>
