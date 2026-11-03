@@ -37,6 +37,8 @@ WORK EXPERIENCE:
 3. Software Engineer at BlackCoffer (Feb 2023 - Aug 2024, Remote): Built an API Admin & Client Dashboard in Angular covering 150+ REST APIs with role-based access control. Built a multi-role hospital management system (patient discharge and call monitoring) with Angular, Node.js and MySQL on AWS. Added real-time alerts with Socket.IO. Cut build size by 50% and set up CI/CD pipelines.
 4. Full Stack Developer Intern at AppiVa Software Pvt Ltd (Jul 2022 - Dec 2022, Remote): Built features across Angular, Node.js and Python applications backed by Firebase. Deployed applications to AWS. Fixed production bugs and optimised queries.
 5. Angular Developer Intern at Faclon Labs Pvt Ltd (Nov 2021 - Apr 2022, Mumbai, Remote): Built admin panels for an IoT platform in Angular. Built telemetry dashboards with RxJS.
+6. Front End Trainee at SounderGrad (May 2021 - Aug 2021): Trained in HTML, CSS, JavaScript, jQuery and Angular; built a Corona Tracker app with Angular and REST APIs.
+7. Student Intern at Karanji InfoTech Pvt Ltd (Jun 2019 - Jul 2019): Built a text-to-speech application in Python.
 
 EDUCATION:
 - B.E. in Computer Science & Engineering, Sahyadri College of Engineering & Management, Mangalore (Aug 2016 - Aug 2020).
