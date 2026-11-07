@@ -6,6 +6,7 @@ tags: ["Next.js", "React", "Framer Motion", "AI Agents", "MCP"]
 github: "https://github.com/manthanank/nexus-landing"
 live: "https://nexus-landing-app.vercel.app"
 featured: true
+category: "landing"
 ---
 
 ## Overview
@@ -23,3 +24,4 @@ Nexus is a developer-first platform designed to deploy, simulate, and coordinate
 ## Technical Architecture
 
 Powered by Next.js 15 App Router, React 19, Tailwind CSS v4, and Framer Motion. Engineered for sub-100ms UI responsiveness with streaming AI interaction models.
+

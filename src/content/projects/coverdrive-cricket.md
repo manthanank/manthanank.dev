@@ -6,6 +6,7 @@ tags: ["Next.js", "React", "Tailwind CSS", "Framer Motion", "SportsTech"]
 github: "https://github.com/manthanank/coverdrive-cricket"
 live: "https://coverdrive-cricket.vercel.app"
 featured: true
+category: "landing"
 ---
 
 ## Overview
@@ -23,3 +24,4 @@ CoverDrive Cricket is a high-performance sports technology web platform built fo
 ## Technical Architecture
 
 Built with Next.js 15 App Router, React 19 concurrent features, Tailwind CSS v4, and Framer Motion spring physics. Continuously deployed to Vercel Edge with zero-downtime Git webhooks and privacy-compliant `@vercel/analytics`.
+

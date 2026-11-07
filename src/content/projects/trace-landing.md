@@ -6,6 +6,7 @@ tags: ["Next.js", "React", "eBPF", "Observability", "OpenTelemetry"]
 github: "https://github.com/manthanank/trace-landing"
 live: "https://trace-landing-app.vercel.app"
 featured: true
+category: "landing"
 ---
 
 ## Overview
@@ -23,3 +24,4 @@ Trace is a next-generation distributed telemetry platform that ingests millions 
 ## Technical Architecture
 
 Built with Next.js 15 App Router, React 19, Tailwind CSS v4, and OpenTelemetry standards. Deployed on Vercel Edge with continuous delivery and live performance metrics.
+

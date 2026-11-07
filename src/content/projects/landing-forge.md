@@ -6,6 +6,7 @@ tags: ["Next.js", "TypeScript", "Tailwind CSS", "Developer Tools"]
 github: "https://github.com/manthanank/landing-forge"
 live: "https://landing-forge-app.vercel.app"
 featured: true
+category: "landing"
 ---
 
 ## Overview
@@ -23,3 +24,4 @@ Landing Forge is a developer-first scaffolding suite and template engine that ge
 ## Technical Architecture
 
 Engineered with Next.js 15, React 19, Tailwind CSS v4, and Framer Motion. Configured with strict TypeScript validation, dynamic sitemaps, robots.txt, and Web App Manifests.
+

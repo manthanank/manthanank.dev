@@ -6,6 +6,7 @@ tags: ["Angular", "TypeScript", "RxJS"]
 github: "https://github.com/manthanank/learn-angular"
 live: "https://learn-angular.netlify.app"
 featured: true
+category: "thelearninghub"
 ---
 
 ## Overview

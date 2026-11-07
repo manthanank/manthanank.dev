@@ -24,7 +24,9 @@ const projects = defineCollection({
     tags: z.array(z.string()).default([]),
     github: z.string().optional(),
     live: z.string().optional(),
+    company: z.string().optional(),
     featured: z.boolean().default(false),
+    category: z.string().optional().default('work'),
   }),
 });
 

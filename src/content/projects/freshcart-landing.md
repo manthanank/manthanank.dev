@@ -6,6 +6,7 @@ tags: ["React", "Tailwind CSS", "E-Commerce", "UX Design"]
 github: "https://github.com/manthanank/freshcart-landing"
 live: "https://freshcart-landing.vercel.app"
 featured: true
+category: "landing"
 ---
 
 ## Overview
@@ -23,3 +24,4 @@ FreshCart is a hyper-local grocery delivery platform connecting households with 
 ## Technical Architecture
 
 Built with modern React and Tailwind CSS, featuring SVG displacement glassmorphism, responsive mobile-first viewports, full PWA manifest, and Vercel continuous deployment.
+

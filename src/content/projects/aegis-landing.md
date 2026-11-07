@@ -6,6 +6,7 @@ tags: ["Next.js", "React", "Tailwind CSS", "Cybersecurity", "Zero-Trust"]
 github: "https://github.com/manthanank/aegis-landing"
 live: "https://aegis-landing-app.vercel.app"
 featured: true
+category: "landing"
 ---
 
 ## Overview
@@ -23,3 +24,4 @@ Aegis is an enterprise cloud defense platform designed for mission-critical infr
 ## Technical Architecture
 
 Built with Next.js 15, React 19, Tailwind CSS v4, and strict TypeScript. Deployed on Vercel Edge with zero compile warnings and verified Git author identity pipelines.
+
