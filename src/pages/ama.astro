@@ -1,14 +1,34 @@
 ---
 export const prerender = false;
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { db, AMAQuestions, eq, desc } from 'astro:db';
+import { db, AMAQuestions, eq, desc, sql } from 'astro:db';
 
-// Fetch answered questions for display
-const answeredQuestions = await db
-  .select()
-  .from(AMAQuestions)
-  .where(eq(AMAQuestions.answered, true))
-  .orderBy(desc(AMAQuestions.createdAt));
+let answeredQuestions: any[] = [];
+
+try {
+  // Ensure table exists on remote DB if not yet migrated
+  try {
+    await db.run(sql`CREATE TABLE IF NOT EXISTS AMAQuestions (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      question TEXT NOT NULL,
+      answer TEXT,
+      answered INTEGER DEFAULT 0,
+      createdAt TEXT NOT NULL
+    )`);
+  } catch (tableErr) {
+    console.warn('Table creation check:', tableErr);
+  }
+
+  answeredQuestions = await db
+    .select()
+    .from(AMAQuestions)
+    .where(eq(AMAQuestions.answered, true))
+    .orderBy(desc(AMAQuestions.createdAt));
+} catch (e: any) {
+  console.warn('Failed to fetch AMA questions:', e?.message || e);
+  answeredQuestions = [];
+}
 ---
 
 <BaseLayout title="AMA | Manthan Ankolekar" description="Ask Me Anything — submit a question and I'll answer it publicly.">
