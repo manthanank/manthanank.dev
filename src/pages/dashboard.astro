@@ -270,6 +270,10 @@ const wakaEditors = [
           <span class="stat-number">{totalBlogPosts}</span>
           <span class="stat-label">Total Blog Posts</span>
         </div>
+        <div class="dashboard-stat-card">
+          <span class="stat-number">{totalNpmDownloads.toLocaleString()}</span>
+          <span class="stat-label">Weekly NPM Downloads</span>
+        </div>
       </div>
 
       <!-- Top Blog Posts by Views -->
@@ -304,7 +308,7 @@ const wakaEditors = [
             <div class="donut-wrapper">
               <svg class="donut-svg" viewBox="0 0 140 140">
                 <circle cx="70" cy="70" r="50" fill="transparent" stroke="var(--color-bg-alt)" stroke-width="8"></circle>
-                {wakaLanguageSegments.map((lang, idx) => (
+                {wakaLanguageSegments.map((lang) => (
                   <circle
                     class="donut-segment"
                     cx="70"
@@ -926,7 +930,6 @@ const wakaEditors = [
       }
 
       const activeSegment = segments[index];
-      const activeLegend = legendItems[index];
 
       if (!activeSegment) return;
 
@@ -973,7 +976,7 @@ const wakaEditors = [
       seg.addEventListener('mouseenter', () => highlightSegment(idx));
     });
 
-    legendItems.forEach((item, idx) => {
+    legendItems.forEach((item) => {
       item.addEventListener('mouseenter', () => {
         const indexStr = item.getAttribute('data-index');
         if (indexStr !== null) {

@@ -2,15 +2,15 @@ export const prerender = false;
 import { db, Guestbook, eq } from 'astro:db';
 import type { APIRoute } from 'astro';
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, cookies }) => {
   try {
-    const body = await request.json();
+    const adminPassword = import.meta.env.ADMIN_PASSWORD || 'admin123';
+    const hasCookieAuth = cookies.get('admin_session')?.value === adminPassword;
+    const body = await request.json().catch(() => ({}));
     const { id, passcode } = body;
 
-    const adminPassword = import.meta.env.ADMIN_PASSWORD || 'admin123'; // Default fallback
-
-    if (passcode !== adminPassword) {
-      return new Response(JSON.stringify({ error: 'Unauthorized. Invalid passcode.' }), { status: 401 });
+    if (!hasCookieAuth && passcode !== adminPassword) {
+      return new Response(JSON.stringify({ error: 'Unauthorized. Invalid session or passcode.' }), { status: 401 });
     }
 
     if (!id) {

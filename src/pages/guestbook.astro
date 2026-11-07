@@ -75,8 +75,8 @@ const entries = await db.select().from(GuestbookTable).orderBy(desc(GuestbookTab
           <label>Don’t fill this out if you’re human: <input id="bot-field" name="bot-field" /></label>
         </p>
 
-        <div id="form-error" class="error-banner" style="display:none"></div>
-        <div id="form-success" class="success-banner" style="display:none">Thanks for signing the guestbook! Your note has been added below.</div>
+        <div id="form-error" class="error-banner" style={error ? "" : "display:none"}>{error}</div>
+        <div id="form-success" class="success-banner" style={success ? "" : "display:none"}>Thanks for signing the guestbook! Your note has been added below.</div>
 
         <div class="grid">
           <div class="field">

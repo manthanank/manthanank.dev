@@ -4,7 +4,6 @@ import SkillBadge from '../components/SkillBadge.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import BlogCard from '../components/BlogCard.astro';
 import { getCollection } from 'astro:content';
-import { isExcludedRepo } from '../data/excluded-repos';
 import { db, PageViews, PageLikes } from 'astro:db';
 
 const skills = [

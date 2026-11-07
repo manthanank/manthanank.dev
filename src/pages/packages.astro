@@ -57,11 +57,11 @@ const totalDownloads = packagesWithStats.reduce((sum, p) => sum + p.downloads, 0
       <div class="packages-stats reveal">
         <div class="stat-card">
           <div class="stat-number">{npmPackages.length}</div>
-          <div class="stat-label">Packages</div>
+          <div class="stat-label">Published Packages</div>
         </div>
         <div class="stat-card">
-          <div class="stat-number">Open</div>
-          <div class="stat-label">Source</div>
+          <div class="stat-number">{totalDownloads.toLocaleString()}</div>
+          <div class="stat-label">Weekly Downloads</div>
         </div>
       </div>
     </div>

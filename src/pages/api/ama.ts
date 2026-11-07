@@ -1,6 +1,5 @@
 import type { APIRoute } from 'astro';
 import { db, AMAQuestions, sql } from 'astro:db';
-import { nanoid } from 'nanoid';
 
 export const prerender = false;
 
@@ -42,7 +41,7 @@ export const POST: APIRoute = async ({ request }) => {
     await ensureTable();
 
     await db.insert(AMAQuestions).values({
-      id: nanoid(),
+      id: crypto.randomUUID(),
       name: name.trim().slice(0, 80),
       question: question.trim(),
       answer: null,

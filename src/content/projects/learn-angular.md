@@ -3,7 +3,7 @@ title: "Learn Angular"
 description: "A comprehensive learning resource for Angular developers with examples, best practices, and hands-on projects."
 pubDate: 2024-05-20
 tags: ["Angular", "TypeScript", "RxJS"]
-github: "https://github.com/manthanank/learn-angular"
+github: "https://github.com/TheLearningHubOrg/learn-angular"
 live: "https://learn-angular.netlify.app"
 featured: true
 category: "thelearninghub"
