@@ -45,7 +45,7 @@ EDUCATION:
 
 OPEN SOURCE AND WRITING:
 - 140 articles on Dev.to since July 2022.
-- 16 npm packages published (learn-angular, learn-rxjs, learn-mongodb, learn-javascript, learn-docker, learn-nestjs, learn-mysql, learn-html, learn-css, learn-scss, manthanank, and the @manthanankolekar Angular libraries ng-icons, ng-loader, ng-markdown, ng-pagination and custom-directives).
+- 6 npm packages published (manthanank, and the @manthanankolekar Angular libraries: ng-icons, ng-loader, ng-markdown, ng-pagination and custom-directives).
 - 200+ public GitHub repositories.
 - Founder & maintainer of TheLearningHubOrg open-source organization: comprehensive developer curricula across 30 repositories covering Angular, TypeScript, React, Node.js, System Design, Docker, Kubernetes, AWS, and modern full-stack engineering.
 

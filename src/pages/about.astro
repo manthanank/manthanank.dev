@@ -4,6 +4,7 @@ import { Image } from 'astro:assets';
 import SkillBadge from '../components/SkillBadge.astro';
 import ExperienceItem from '../components/ExperienceItem.astro';
 import TestimonialCard from '../components/TestimonialCard.astro';
+import { NPM_PACKAGES } from '../data/npm-packages';
 
 const testimonials = [
   {
@@ -274,7 +275,7 @@ const {
             <span class="stat-label">Contributions</span>
           </div>
           <div class="stat">
-            <span class="stat-number">16</span>
+            <span class="stat-number">{NPM_PACKAGES.length}</span>
             <span class="stat-label">NPM Packages</span>
           </div>
         </div>
@@ -351,7 +352,7 @@ const {
         <ul class="evidence-list">
           <li><strong>Angular in production</strong> — recruitment and traffic management platforms, a multi-role hospital system, API dashboards, IoT admin panels</li>
           <li><strong>Next.js and Python Flask microservices</strong> — dealer management software and LLM vision pipelines for vehicle reconditioning</li>
-          <li><strong>16 npm packages published</strong>, listed on the <a href="/packages">packages page</a></li>
+          <li><strong>{NPM_PACKAGES.length} npm packages published</strong>, listed on the <a href="/packages">packages page</a></li>
           <li><strong>140 articles on Dev.to</strong> on Angular, Node.js and TypeScript, also listed on <a href="/blog">this blog</a></li>
           <li><strong>30 open-source repositories &amp; 100+ developer guides</strong> maintained in <a href="https://github.com/TheLearningHubOrg" target="_blank" rel="noopener noreferrer">TheLearningHubOrg</a></li>
         </ul>
