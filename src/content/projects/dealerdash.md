@@ -2,7 +2,7 @@
 title: "DealerDash AI"
 description: "AI-powered, human-driven dealership KPI dashboard and operational intelligence platform with predictive scoring, expense analysis, and industry benchmark analytics."
 pubDate: 2026-09-01
-tags: ["Next.js", "TypeScript", "AI / ML", "Automotive", "Analytics"]
+tags: ["Next.js", "TypeScript", "AI", "Automotive", "Analytics"]
 live: "https://dealerdash.ai/"
 company: "Tech Ventures Group"
 featured: true
@@ -33,3 +33,4 @@ To build an instantaneous executive dashboard, I designed a normalized event-dri
 - **Frontend**: Next.js App Router, React 19, TypeScript, Tailwind CSS, Recharts, and dynamic data visualization tables.
 - **Backend & Data Pipeline**: Node.js microservices, PostgreSQL with partitioned analytics tables, Redis caching layer for sub-50ms KPI querying.
 - **Deployment**: High-availability cloud deployment with automated CI/CD pipelines, SSL termination, and enterprise SOC 2-compliant data encryption at rest and in transit.
+

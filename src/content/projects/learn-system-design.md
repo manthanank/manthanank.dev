@@ -19,3 +19,4 @@ Part of **TheLearningHubOrg** open-source initiative, **Learn System Design** is
 - **Data Stores & Caching**: Cache invalidation patterns (Write-through, Write-back, Cache-aside), Redis clusters, ClickHouse columnar storage, and transactional consensus.
 - **Reliability & Resilience**: Circuit breakers, exponential backoff with jitter, rate limiting algorithms (Token Bucket, Leaky Bucket), and zero-downtime deployment pipelines.
 - **Real-World Architectural Blueprints**: Step-by-step system designs for URL shorteners, distributed telemetry tracing engines, ride-sharing geohash dispatchers, and global notification brokers.
+

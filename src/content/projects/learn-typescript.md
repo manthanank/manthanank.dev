@@ -23,3 +23,4 @@ Part of **TheLearningHubOrg** open-source curriculum, **Learn TypeScript** is an
 ## Open Source Impact
 
 Maintained under **TheLearningHubOrg**, providing curated, battle-tested type patterns and interactive examples referenced by engineers worldwide.
+

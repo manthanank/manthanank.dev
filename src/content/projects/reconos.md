@@ -33,3 +33,4 @@ I built an automated end-to-end ingestion test suite against real-world dirty CS
 - **Hosting Architecture**: Self-hosted on AWS EC2 instances with Docker Compose, running containerized PostgreSQL, Supabase, and Caddy reverse proxy for zero-configuration TLS.
 - **CI/CD & Zero-Downtime Releases**: GitHub Actions builds container images, pushes to Amazon ECR, and executes automated rolling deployment with health-check verified rollbacks.
 - **Resource Optimization**: Profiled and resolved memory leaks in long-lived server processes, reducing steady-state RAM consumption from 350MB down to 111MB under active multi-tenant workloads.
+
