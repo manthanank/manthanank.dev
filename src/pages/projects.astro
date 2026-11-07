@@ -179,6 +179,23 @@ const resumeProjects = [
 ];
 
 
+const caseStudies = localProjects
+  .filter((p) => p.data.featured)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .map((p) => ({
+    title: p.data.title,
+    description: p.data.description,
+    tags: p.data.tags,
+    github: p.data.github,
+    live: p.data.live,
+    slug: p.id,
+  }));
+
+pinnedProjects = [
+  ...caseStudies,
+  ...pinnedProjects.filter((p) => !caseStudies.some((c) => c.title.toLowerCase() === p.title.toLowerCase())),
+];
+
 const allViews = await db.select().from(PageViews);
 const allLikes = await db.select().from(PageLikes);
 
